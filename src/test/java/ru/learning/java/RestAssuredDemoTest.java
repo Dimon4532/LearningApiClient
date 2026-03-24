@@ -6,6 +6,8 @@ import org.junit.jupiter.api.*;
 import ru.learning.java.clients.api.ApiClient;
 import ru.learning.java.clients.api.AuthApiClient;
 import ru.learning.java.clients.api.FormApiClient;
+import ru.learning.java.models.Comment;
+import ru.learning.java.models.CreateUserRequest;
 import ru.learning.java.models.Post;
 import ru.learning.java.models.User;
 
@@ -637,5 +639,145 @@ public class RestAssuredDemoTest {
     ).extract().response();
 
     assertThat(response.jsonPath().getString("title")).isEqualTo("Form Client Test");
+  }
+
+  @Test
+  @Order(27)
+  @Story("Работа с комментариями")
+  @DisplayName("27. GET запрос - получение комментариев к посту")
+  @Description("Демонстрация работы с моделью Comment")
+  void testGetCommentsForPost() {
+    Map<String, String> queryParams = new HashMap<>();
+    queryParams.put("postId", "1");
+
+    Response response = apiClient.sendGet(
+      BASE_URL + "/comments",
+      new HashMap<>(),
+      new HashMap<>(),
+      queryParams,
+      new HashMap<>()
+    ).extract().response();
+
+    // Десериализация в список комментариев
+    List<Comment> comments = response.jsonPath().getList("$", Comment.class);
+
+    assertThat(comments).isNotEmpty();
+    assertThat(comments).allMatch(comment -> comment.postId() == 1);
+    assertThat(comments.getFirst().email()).contains("@");
+    assertThat(comments.getFirst().body()).isNotEmpty();
+  }
+
+  @Test
+  @Order(28)
+  @Story("Работа с комментариями")
+  @DisplayName("28. GET запрос - получение конкретного комментария")
+  @Description("Проверка десериализации одного комментария")
+  void testGetSingleComment() {
+    Map<String, String> pathParams = new HashMap<>();
+    pathParams.put("commentId", "1");
+
+    Response response = apiClient.sendGet(
+      BASE_URL + "/comments/{commentId}",
+      new HashMap<>(),
+      pathParams,
+      new HashMap<>(),
+      new HashMap<>()
+    ).extract().response();
+
+    Comment comment = response.as(Comment.class);
+
+    assertThat(comment).isNotNull();
+    assertThat(comment.id()).isEqualTo(1);
+    assertThat(comment.email()).isNotEmpty();
+    assertThat(comment.name()).isNotEmpty();
+  }
+
+  @Test
+  @Order(29)
+  @Story("Создание пользователей")
+  @DisplayName("29. POST запрос - создание пользователя с Builder")
+  @Description("Демонстрация использования CreateUserRequest с Lombok Builder")
+  void testCreateUserWithBuilder() {
+    CreateUserRequest newUser = CreateUserRequest.builder()
+      .name("John Doe")
+      .email("john.doe@example.com")
+      .username("johndoe")
+      .build();
+
+    Response response = apiClient.sendPost(
+      BASE_URL + "/users",
+      201,
+      newUser,
+      new HashMap<>(),
+      new HashMap<>(),
+      new HashMap<>()
+    ).extract().response();
+
+    assertThat(response.jsonPath().getString("name")).isEqualTo("John Doe");
+    assertThat(response.jsonPath().getString("email")).isEqualTo("john.doe@example.com");
+    assertThat(response.jsonPath().getString("username")).isEqualTo("johndoe");
+    assertThat(response.jsonPath().getInt("id")).isGreaterThan(0);
+  }
+
+  @Test
+  @Order(30)
+  @Story("Создание пользователей")
+  @DisplayName("30. POST запрос - создание пользователя через конструктор")
+  @Description("Альтернативный способ создания объекта CreateUserRequest")
+  void testCreateUserWithConstructor() {
+    CreateUserRequest newUser = new CreateUserRequest();
+    newUser.setName("Jane Smith");
+    newUser.setEmail("jane.smith@example.com");
+    newUser.setUsername("janesmith");
+
+    Response response = apiClient.sendPost(
+      BASE_URL + "/users",
+      201,
+      newUser,
+      new HashMap<>(),
+      new HashMap<>(),
+      new HashMap<>()
+    ).extract().response();
+
+    assertThat(response.jsonPath().getString("name")).isEqualTo("Jane Smith");
+    assertThat(response.jsonPath().getString("email")).isEqualTo("jane.smith@example.com");
+  }
+
+  @Test
+  @Order(31)
+  @Story("Комплексные сценарии")
+  @DisplayName("31. Комплексный сценарий - создание поста и комментариев")
+  @Description("Создание поста и получение его комментариев")
+  void testComplexScenarioPostAndComments() {
+    // Создаем пост
+    Post newPost = new Post(1L, null, "Integration Test Post", "Testing comments integration");
+
+    Response postResponse = apiClient.sendPost(
+      BASE_URL + "/posts",
+      201,
+      newPost,
+      new HashMap<>(),
+      new HashMap<>(),
+      new HashMap<>()
+    ).extract().response();
+
+    Long postId = postResponse.jsonPath().getLong("id");
+    assertThat(postId).isNotNull();
+
+    // Получаем комментарии к первому посту (т.к. JSONPlaceholder mock)
+    Map<String, String> queryParams = new HashMap<>();
+    queryParams.put("postId", "1");
+
+    Response commentsResponse = apiClient.sendGet(
+      BASE_URL + "/comments",
+      new HashMap<>(),
+      new HashMap<>(),
+      queryParams,
+      new HashMap<>()
+    ).extract().response();
+
+    List<Comment> comments = commentsResponse.jsonPath().getList("$", Comment.class);
+    assertThat(comments).isNotEmpty();
+    assertThat(comments).allMatch(c -> c.postId() == 1);
   }
 }

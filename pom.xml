@@ -14,15 +14,16 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
         <lombok.version>1.18.40</lombok.version>
-        <logback.version>1.5.19</logback.version>
-        <rest-assured.version>5.5.6</rest-assured.version>
+        <logback.version>1.5.32</logback.version>
+        <rest-assured.version>6.0.0</rest-assured.version>
         <typesafe-config.version>1.4.3</typesafe-config.version>
         <junit.version>5.11.4</junit.version>
-        <assertj.version>3.27.3</assertj.version>
-        <jackson.version>2.18.3</jackson.version>
+        <assertj.version>3.27.7</assertj.version>
+        <jackson.version>3.1.0</jackson.version>
         <pekko.version>1.1.3</pekko.version>
         <allure.version>2.32.0</allure.version>
         <maven-surefire.version>3.5.2</maven-surefire.version>
+        <jackson-datatype-jsr310.version>3.0.0-rc2</jackson-datatype-jsr310.version>
     </properties>
 
     <dependencies>
@@ -77,15 +78,16 @@
         </dependency>
 
         <!-- Jackson для работы с JSON -->
+
         <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
+            <groupId>tools.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
             <version>${jackson.version}</version>
         </dependency>
         <dependency>
-            <groupId>com.fasterxml.jackson.datatype</groupId>
+            <groupId>tools.jackson.datatype</groupId>
             <artifactId>jackson-datatype-jsr310</artifactId>
-            <version>${jackson.version}</version>
+            <version>${jackson-datatype-jsr310.version}</version>
         </dependency>
 
         <!-- Apache Pekko (замена Akka) -->
