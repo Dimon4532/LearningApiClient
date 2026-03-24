@@ -8,6 +8,8 @@ import ru.learning.java.actors.HttpRequestActor;
 import ru.learning.java.actors.HttpSupervisor;
 
 import java.time.Duration;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.CompletionStage;
 import java.util.concurrent.ExecutionException;
 
@@ -69,21 +71,20 @@ public class PekkoActorsDemoTest {
             }
             """;
 
-    for(int i = 1; i <= 5; i++) {
-      CompletionStage<HttpRequestActor.Response> result = AskPattern.ask(
-        actorSystem,
-        replyTo -> new HttpSupervisor.StartPostRequest(
-          "req-2", BASE_URL + "/posts", requestBody, replyTo
-        ),
-        Duration.ofSeconds(10),
-        actorSystem.scheduler()
-      );
+    CompletionStage<HttpRequestActor.Response> result = AskPattern.ask(
+      actorSystem,
+      replyTo -> new HttpSupervisor.StartPostRequest(
+        "req-2", BASE_URL + "/posts", requestBody, replyTo
+      ),
+      Duration.ofSeconds(10),
+      actorSystem.scheduler()
+    );
 
-      HttpRequestActor.Response response = result.toCompletableFuture().get();
-      assertThat(response.success()).isTrue();
-      assertThat(response.statusCode()).isIn(200, 201);
-      assertThat(response.body()).contains("Actor Test Post");
-    }
+    HttpRequestActor.Response response = result.toCompletableFuture().get();
+
+    assertThat(response.success()).isTrue();
+    assertThat(response.statusCode()).isIn(200, 201);
+    assertThat(response.body()).contains("Actor Test Post");
   }
 
   @Test
@@ -93,11 +94,11 @@ public class PekkoActorsDemoTest {
   @Description("Демонстрация параллельной работы нескольких акторов")
   void testMultipleParallelRequests() throws ExecutionException, InterruptedException {
     // Запускаем 5 параллельных запросов
-    CompletionStage<HttpRequestActor.Response>[] requests = new CompletionStage[5];
+    List<CompletionStage<HttpRequestActor.Response>> requests = new ArrayList<>();
 
     for (int i = 1; i <= 5; i++) {
       final int userId = i;
-      requests[i - 1] = AskPattern.ask(
+      requests.add(AskPattern.ask(
         actorSystem,
         replyTo -> new HttpSupervisor.StartRequest(
           "parallel-req-" + userId,
@@ -106,7 +107,7 @@ public class PekkoActorsDemoTest {
         ),
         Duration.ofSeconds(10),
         actorSystem.scheduler()
-      );
+      ));
     }
 
     // Ждем завершения всех запросов
