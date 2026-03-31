@@ -7,12 +7,7 @@ import java.util.Map;
 
 import static io.restassured.RestAssured.given;
 
-/**
- * Базовый API клиент для стандартных HTTP запросов
- * Содержит основные методы для работы с REST API
- */
 public class ApiClient extends Specification {
-
   /**
    * [GET]
    *
@@ -20,13 +15,11 @@ public class ApiClient extends Specification {
    * @param headers     заголовки
    * @param pathParams  параметры пути запроса
    * @param queryParams параметры запроса
-   * @param cookies     cookies
    */
   public ValidatableResponse sendGet(String url,
-                                     Map<String, String> headers,
-                                     Map<String, String> pathParams,
-                                     Map<String, String> queryParams,
-                                     Map<String, String> cookies) {
+                                     Map<String, String> headers, Map<String, String> pathParams,
+                                     Map<String, String> queryParams, Map<String, String> cookies
+  ) {
     installSpecification(requestSpecification(), responseSpecification());
     return given()
       .redirects().follow(false)
@@ -52,12 +45,10 @@ public class ApiClient extends Specification {
    * @param pathParams  параметры пути запроса
    * @param queryParams параметры запроса
    */
-  public ValidatableResponse sendPost(String url,
-                                      int statusCode,
-                                      Object body,
-                                      Map<String, String> headers,
-                                      Map<String, String> pathParams,
-                                      Map<String, String> queryParams) {
+  public ValidatableResponse sendPost(String url, int statusCode, String body,
+                                      Map<String, String> headers, Map<String, String> pathParams,
+                                      Map<String, String> queryParams
+  ) {
     installSpecification(requestSpecification(), responseSpecification());
     return given()
       .redirects().follow(false)
@@ -84,12 +75,10 @@ public class ApiClient extends Specification {
    * @param pathParams  параметры пути запроса
    * @param queryParams параметры запроса
    */
-  public ValidatableResponse sendPut(String url,
-                                     int statusCode,
-                                     Object body,
-                                     Map<String, String> headers,
-                                     Map<String, String> pathParams,
-                                     Map<String, String> queryParams) {
+  public ValidatableResponse sendPut(String url, int statusCode, String body,
+                                     Map<String, String> headers, Map<String, String> pathParams,
+                                     Map<String, String> queryParams
+  ) {
     installSpecification(requestSpecification(), responseSpecification());
     return given()
       .headers(headers)
@@ -113,12 +102,10 @@ public class ApiClient extends Specification {
    * @param pathParams  параметры пути запроса
    * @param queryParams параметры запроса
    */
-  public ValidatableResponse sendPatch(String url,
-                                       int statusCode,
-                                       Object body,
-                                       Map<String, String> headers,
-                                       Map<String, String> pathParams,
-                                       Map<String, String> queryParams) {
+  public ValidatableResponse sendPatch(String url, int statusCode, String body,
+                                       Map<String, String> headers, Map<String, String> pathParams,
+                                       Map<String, String> queryParams
+  ) {
     installSpecification(requestSpecification(), responseSpecification());
     return given()
       .headers(headers)
@@ -141,11 +128,9 @@ public class ApiClient extends Specification {
    * @param pathParams  параметры пути запроса
    * @param queryParams параметры запроса
    */
-  public void sendDelete(String url,
-                         int statusCode,
-                         Map<String, String> headers,
-                         Map<String, String> pathParams,
-                         Map<String, String> queryParams) {
+  public void sendDelete(String url, int statusCode,
+                         Map<String, String> headers, Map<String, String> pathParams, Map<String, String> queryParams
+  ) {
     installSpecification(requestSpecification(), responseSpecification());
     given()
       .headers(headers)
