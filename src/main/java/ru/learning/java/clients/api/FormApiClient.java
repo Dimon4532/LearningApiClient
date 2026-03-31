@@ -1,5 +1,6 @@
 package ru.learning.java.clients.api;
 
+import io.restassured.http.ContentType;
 import io.restassured.response.ValidatableResponse;
 
 import java.util.Map;
@@ -47,6 +48,7 @@ public class FormApiClient extends ApiClient {
                                                     Map<String, String> formParams) {
     installSpecification(requestSpecification(), responseSpecification());
     return given()
+      .contentType(ContentType.URLENC)
       .headers(headers)
       .formParams(formParams)
       .when()
@@ -69,6 +71,7 @@ public class FormApiClient extends ApiClient {
                                                     Map<String, String> formParams) {
     installSpecification(requestSpecification(), responseSpecification());
     return given()
+      .contentType(ContentType.URLENC)
       .redirects().follow(false)
       .cookies(cookies)
       .headers(headers)
@@ -93,6 +96,7 @@ public class FormApiClient extends ApiClient {
                                                    Map<String, String> formParams) {
     installSpecification(requestSpecification(), responseSpecification());
     return given()
+      .contentType(ContentType.URLENC)
       .cookies(cookies)
       .headers(headers)
       .formParams(formParams)
@@ -116,6 +120,7 @@ public class FormApiClient extends ApiClient {
                                                      Map<String, String> formParams) {
     installSpecification(requestSpecification(), responseSpecification());
     return given()
+      .contentType(ContentType.URLENC)
       .cookies(cookies)
       .headers(headers)
       .formParams(formParams)

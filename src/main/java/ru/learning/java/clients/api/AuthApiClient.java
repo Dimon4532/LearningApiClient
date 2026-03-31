@@ -180,4 +180,195 @@ public class AuthApiClient extends ApiClient {
       .assertThat().statusCode(statusCode)
       .log().ifError();
   }
+
+  // ==================== BEARER TOKEN МЕТОДЫ ====================
+
+  /**
+   * [POST] для получения токена
+   * Обычно используется для OAuth2 или других систем аутентификации
+   *
+   * @param url         адрес сервиса
+   * @param statusCode  ожидаемый статус код
+   * @param body        тело запроса (обычно credentials)
+   * @param headers     заголовки
+   * @param pathParams  параметры пути запроса
+   * @param queryParams параметры запроса
+   */
+  public ValidatableResponse sendPostForToken(String url,
+                                              int statusCode,
+                                              Object body,
+                                              Map<String, String> headers,
+                                              Map<String, String> pathParams,
+                                              Map<String, String> queryParams) {
+    installSpecification(requestSpecification(), responseSpecification());
+    return given()
+      .headers(headers)
+      .pathParams(pathParams)
+      .queryParams(queryParams)
+      .body(body)
+      .when()
+      .post(url)
+      .then()
+      .assertThat().statusCode(statusCode)
+      .log().all();
+  }
+
+  /**
+   * [GET] с Bearer Token
+   *
+   * @param url         адрес сервиса
+   * @param statusCode  ожидаемый статус код
+   * @param token       Bearer token
+   * @param headers     заголовки
+   * @param pathParams  параметры пути запроса
+   * @param queryParams параметры запроса
+   */
+  public ValidatableResponse sendGetWithBearerToken(String url,
+                                                    int statusCode,
+                                                    String token,
+                                                    Map<String, String> headers,
+                                                    Map<String, String> pathParams,
+                                                    Map<String, String> queryParams) {
+    installSpecification(requestSpecification(), responseSpecification());
+    return given()
+      .auth()
+      .oauth2(token)
+      .headers(headers)
+      .pathParams(pathParams)
+      .queryParams(queryParams)
+      .when()
+      .get(url)
+      .then()
+      .assertThat().statusCode(statusCode)
+      .log().ifError();
+  }
+
+  /**
+   * [POST] с Bearer Token
+   *
+   * @param url         адрес сервиса
+   * @param statusCode  ожидаемый статус код
+   * @param token       Bearer token
+   * @param body        тело запроса
+   * @param headers     заголовки
+   * @param pathParams  параметры пути запроса
+   * @param queryParams параметры запроса
+   */
+  public ValidatableResponse sendPostWithBearerToken(String url,
+                                                     int statusCode,
+                                                     String token,
+                                                     Object body,
+                                                     Map<String, String> headers,
+                                                     Map<String, String> pathParams,
+                                                     Map<String, String> queryParams) {
+    installSpecification(requestSpecification(), responseSpecification());
+    return given()
+      .auth()
+      .oauth2(token)
+      .headers(headers)
+      .pathParams(pathParams)
+      .queryParams(queryParams)
+      .body(body)
+      .when()
+      .post(url)
+      .then()
+      .assertThat().statusCode(statusCode)
+      .log().ifError();
+  }
+
+  /**
+   * [PUT] с Bearer Token
+   *
+   * @param url         адрес сервиса
+   * @param statusCode  ожидаемый статус код
+   * @param token       Bearer token
+   * @param body        тело запроса
+   * @param headers     заголовки
+   * @param pathParams  параметры пути запроса
+   * @param queryParams параметры запроса
+   */
+  public ValidatableResponse sendPutWithBearerToken(String url,
+                                                    int statusCode,
+                                                    String token,
+                                                    Object body,
+                                                    Map<String, String> headers,
+                                                    Map<String, String> pathParams,
+                                                    Map<String, String> queryParams) {
+    installSpecification(requestSpecification(), responseSpecification());
+    return given()
+      .auth()
+      .oauth2(token)
+      .headers(headers)
+      .pathParams(pathParams)
+      .queryParams(queryParams)
+      .body(body)
+      .when()
+      .put(url)
+      .then()
+      .assertThat().statusCode(statusCode)
+      .log().ifError();
+  }
+
+  /**
+   * [PATCH] с Bearer Token
+   *
+   * @param url         адрес сервиса
+   * @param statusCode  ожидаемый статус код
+   * @param token       Bearer token
+   * @param body        тело запроса
+   * @param headers     заголовки
+   * @param pathParams  параметры пути запроса
+   * @param queryParams параметры запроса
+   */
+  public ValidatableResponse sendPatchWithBearerToken(String url,
+                                                      int statusCode,
+                                                      String token,
+                                                      Object body,
+                                                      Map<String, String> headers,
+                                                      Map<String, String> pathParams,
+                                                      Map<String, String> queryParams) {
+    installSpecification(requestSpecification(), responseSpecification());
+    return given()
+      .auth()
+      .oauth2(token)
+      .headers(headers)
+      .pathParams(pathParams)
+      .queryParams(queryParams)
+      .body(body)
+      .when()
+      .patch(url)
+      .then()
+      .assertThat().statusCode(statusCode)
+      .log().ifError();
+  }
+
+  /**
+   * [DELETE] с Bearer Token
+   *
+   * @param url         адрес сервиса
+   * @param statusCode  ожидаемый статус код
+   * @param token       Bearer token
+   * @param headers     заголовки
+   * @param pathParams  параметры пути запроса
+   * @param queryParams параметры запроса
+   */
+  public ValidatableResponse sendDeleteWithBearerToken(String url,
+                                                       int statusCode,
+                                                       String token,
+                                                       Map<String, String> headers,
+                                                       Map<String, String> pathParams,
+                                                       Map<String, String> queryParams) {
+    installSpecification(requestSpecification(), responseSpecification());
+    return given()
+      .auth()
+      .oauth2(token)
+      .headers(headers)
+      .pathParams(pathParams)
+      .queryParams(queryParams)
+      .when()
+      .delete(url)
+      .then()
+      .assertThat().statusCode(statusCode)
+      .log().ifError();
+  }
 }
