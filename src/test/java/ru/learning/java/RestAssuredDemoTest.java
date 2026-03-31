@@ -763,7 +763,6 @@ public class RestAssuredDemoTest {
   @Description("Проверка обработки невалидного токена")
   void testInvalidBearerToken() {
     // httpbin /bearer требует правильный формат токена
-    String invalidToken = "";
 
     Response response = authApiClient.sendGet(
       HTTPBIN_URL + "/bearer",
