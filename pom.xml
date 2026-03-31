@@ -12,16 +12,30 @@
         <maven.compiler.source>21</maven.compiler.source>
         <maven.compiler.target>21</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-
+        <!-- Lombok -->
         <lombok.version>1.18.40</lombok.version>
-        <logback.version>1.5.19</logback.version>
-        <rest-assured.version>5.5.6</rest-assured.version>
+        <!-- Logback -->
+        <logback.version>1.5.32</logback.version>
+        <!-- REST Assured -->
+        <rest-assured.version>5.5.7</rest-assured.version>
+        <!-- Jackson -->
+        <jackson.version>2.21.2</jackson.version>
+        <jackson-annotations.version>2.21</jackson-annotations.version>
+        <!-- Commons Codec -->
+        <commons-codec.version>1.17.1</commons-codec.version>
+        <!-- Typesafe Config -->
         <typesafe-config.version>1.4.3</typesafe-config.version>
-        <junit.version>5.11.4</junit.version>
-        <assertj.version>3.27.3</assertj.version>
-        <jackson.version>2.18.3</jackson.version>
+        <!-- Pekko -->
         <pekko.version>1.1.3</pekko.version>
+        <!-- Allure REST Assured -->
         <allure.version>2.32.0</allure.version>
+        <!-- JUnit 5 -->
+        <junit.version>5.11.4</junit.version>
+        <!-- AssertJ -->
+        <assertj.version>3.27.7</assertj.version>
+
+        <!-- Plugin -->
+        <!-- Maven Surefire -->
         <maven-surefire.version>3.5.2</maven-surefire.version>
     </properties>
 
@@ -41,16 +55,37 @@
             <version>${logback.version}</version>
         </dependency>
 
-        <!-- Rest Assured -->
+        <!-- REST Assured -->
         <dependency>
             <groupId>io.rest-assured</groupId>
             <artifactId>rest-assured</artifactId>
             <version>${rest-assured.version}</version>
         </dependency>
+
+        <!-- Указываем безопасные версии Jackson -->
         <dependency>
-            <groupId>io.rest-assured</groupId>
-            <artifactId>json-schema-validator</artifactId>
-            <version>${rest-assured.version}</version>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>${jackson.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-core</artifactId>
+            <version>${jackson.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-annotations</artifactId>
+            <version>${jackson-annotations.version}</version>
+        </dependency>
+
+        <!-- Безопасная версия Commons Codec -->
+        <dependency>
+            <groupId>commons-codec</groupId>
+            <artifactId>commons-codec</artifactId>
+            <version>${commons-codec.version}</version>
         </dependency>
 
         <!-- Typesafe Config -->
@@ -58,6 +93,21 @@
             <groupId>com.typesafe</groupId>
             <artifactId>config</artifactId>
             <version>${typesafe-config.version}</version>
+        </dependency>
+
+        <!-- Pekko -->
+        <dependency>
+            <groupId>org.apache.pekko</groupId>
+            <artifactId>pekko-actor-typed_2.13</artifactId>
+            <version>${pekko.version}</version>
+        </dependency>
+
+        <!-- Allure REST Assured -->
+        <dependency>
+            <groupId>io.qameta.allure</groupId>
+            <artifactId>allure-rest-assured</artifactId>
+            <version>${allure.version}</version>
+            <scope>test</scope>
         </dependency>
 
         <!-- JUnit 5 -->
@@ -74,38 +124,6 @@
             <artifactId>assertj-core</artifactId>
             <version>${assertj.version}</version>
             <scope>test</scope>
-        </dependency>
-
-        <!-- Jackson для работы с JSON -->
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-databind</artifactId>
-            <version>${jackson.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.datatype</groupId>
-            <artifactId>jackson-datatype-jsr310</artifactId>
-            <version>${jackson.version}</version>
-        </dependency>
-
-        <!-- Apache Pekko (замена Akka) -->
-        <dependency>
-            <groupId>org.apache.pekko</groupId>
-            <artifactId>pekko-actor-typed_2.13</artifactId>
-            <version>${pekko.version}</version>
-        </dependency>
-
-        <!-- Allure для отчетов -->
-        <dependency>
-            <groupId>io.qameta.allure</groupId>
-            <artifactId>allure-junit5</artifactId>
-            <version>${allure.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>io.qameta.allure</groupId>
-            <artifactId>allure-rest-assured</artifactId>
-            <version>${allure.version}</version>
         </dependency>
     </dependencies>
 
