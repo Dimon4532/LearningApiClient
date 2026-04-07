@@ -72,29 +72,36 @@
 
 ### Простой GET запрос
 
-java 
-@Test 
-void testSimpleGetRequest() { 
-Response response = apiClient.sendGet((), new HashMap<>(), new HashMap<>(), new HashMap<>) )">.extract().response();
-assertThat(response.statusCode()).isEqualTo(200);
+```java 
+@Test
+@Order(1)
+@Story("GET запросы")
+@DisplayName("1. Простой GET запрос - получение списка пользователей")
+@Description("Демонстрация базового GET запроса и валидации статус кода")
+void testSimpleGetRequest() {
+   Response response = apiClient.sendGet(BASE_URL + "/users", new HashMap<>(), new HashMap<>(), new HashMap<>(), new HashMap<>()).extract().response();
+   
+   assertThat(response.statusCode()).isEqualTo(200);
+   
+   assertThat(response.jsonPath().getList("$")).isNotEmpty();
 }
+```
 
 ### POST запрос с JSON 
-java 
-@Test 
-void testPostWithJson() throws JsonProcessingException { 
-Post newPost = new Post(1L, null, "Title", "Content");
-Response response = apiClient.sendPost(
-BASE_URL + "/posts",
-201,
-objectMapper.writeValueAsString(newPost),
-new HashMap<>(),
-new HashMap<>(),
-new HashMap<>()
-).extract().response();
+```java 
+@Test
+@Order(7)
+@Story("POST запросы")
+@DisplayName("7. POST запрос с объектом")
+@Description("Создание поста из Java объекта")
+void testPostRequestWithObject() throws JsonProcessingException {
+   Post newPost = new Post(1L, null, "My Test Post", "Content of my test post");
 
-assertThat(response.jsonPath().getInt("id")).isGreaterThan(0);
+   Response response = apiClient.sendPost(BASE_URL + "/posts", 201, objectMapper.writeValueAsString(newPost), new HashMap<>(), new HashMap<>(), new HashMap<>()).extract().response();
+
+   assertThat(response.jsonPath().getInt("id")).isGreaterThan(0);
 }
+```
 
 ## 🔧 API Клиенты
 
@@ -162,13 +169,27 @@ assertThat(response.jsonPath().getInt("id")).isGreaterThan(0);
 
 Демонстрация асинхронных запросов с Apache Pekko:
 
-java 
-@Test 
+```java 
+@Test
+@Order(1)
+@Story("Акторы")
+@DisplayName("1. Выполнение GET запроса через актор")
+@Description("Демонстрация асинхронного выполнения GET запроса")
 void testGetRequestWithActor() throws ExecutionException, InterruptedException {
-CompletionStage<HttpRequestActor.Response> result = AskPattern.ask;
-HttpRequestActor.Response response = result.toCompletableFuture().get();
-assertThat(response.success()).isTrue();
+   CompletionStage<HttpRequestActor.Response> result = AskPattern.ask(
+           actorSystem,
+           replyTo -> new HttpSupervisor.StartRequest("req-1", BASE_URL + "/users/1", replyTo),
+           Duration.ofSeconds(10),
+           actorSystem.scheduler()
+   );
+
+   HttpRequestActor.Response response = result.toCompletableFuture().get();
+
+   assertThat(response.success()).isTrue();
+   assertThat(response.statusCode()).isEqualTo(200);
+   assertThat(response.body()).contains("\"id\": 1");
 }
+```
 
 ## 🔄 Дальнейшее развитие
 
