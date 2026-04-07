@@ -64,12 +64,12 @@ public class PekkoActorsDemoTest {
   @Description("Демонстрация асинхронного выполнения POST запроса")
   void testPostRequestWithActor() throws ExecutionException, InterruptedException {
     String requestBody = """
-            {
-                "userId": 1,
-                "title": "Actor Test Post",
-                "body": "Post created via Pekko Actor"
-            }
-            """;
+      {
+          "userId": 1,
+          "title": "Actor Test Post",
+          "body": "Post created via Pekko Actor"
+      }
+      """;
 
     CompletionStage<HttpRequestActor.Response> result = AskPattern.ask(
       actorSystem,
