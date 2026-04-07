@@ -8,11 +8,15 @@ import org.junit.jupiter.api.*;
 import ru.learning.java.clients.api.ApiClient;
 import ru.learning.java.clients.api.AuthApiClient;
 import ru.learning.java.clients.api.FormApiClient;
+import ru.learning.java.clients.api.MultipartApiClient;
 import ru.learning.java.models.Comment;
 import ru.learning.java.models.CreateUserRequest;
 import ru.learning.java.models.Post;
 import ru.learning.java.models.User;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -773,5 +777,26 @@ public class RestAssuredDemoTest {
 
     // Без токена должен вернуться 401
     assertThat(response.statusCode()).isEqualTo(401);
+  }
+
+  // ==================== MULTIPART ТЕСТЫ ====================
+  @Test
+  @Order(40)
+  @Story("Multipart")
+  @DisplayName("40. Загрузка текстового файла")
+  void testUploadTextFile() throws IOException {
+    File tempFile = File.createTempFile("test-upload", ".txt");
+    tempFile.deleteOnExit();
+    Files.writeString(tempFile.toPath(), "Hello from REST Assured!");
+
+    MultipartApiClient multipartClient = new MultipartApiClient();
+
+    Response response = multipartClient
+      .uploadFile(HTTPBIN_URL + "/post", 200, tempFile, "file", new HashMap<>())
+      .extract().response();
+
+    // httpbin возвращает содержимое файла в поле "files"
+    assertThat(response.jsonPath().getString("files.file"))
+      .isEqualTo("Hello from REST Assured!");
   }
 }
