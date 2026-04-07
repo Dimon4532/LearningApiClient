@@ -5,10 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.qameta.allure.*;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.*;
-import ru.learning.java.clients.api.ApiClient;
-import ru.learning.java.clients.api.AuthApiClient;
-import ru.learning.java.clients.api.FormApiClient;
-import ru.learning.java.clients.api.MultipartApiClient;
+import ru.learning.java.clients.api.*;
 import ru.learning.java.models.Comment;
 import ru.learning.java.models.CreateUserRequest;
 import ru.learning.java.models.Post;
@@ -37,6 +34,8 @@ public class RestAssuredDemoTest {
   private static ApiClient apiClient;
   private static AuthApiClient authApiClient;
   private static FormApiClient formApiClient;
+  private static MultipartApiClient multipartApiClient;
+  private static SoapApiClient soapApiClient;
   private static ObjectMapper objectMapper;
 
   private static final String BASE_URL = "https://jsonplaceholder.typicode.com";
@@ -791,9 +790,7 @@ public class RestAssuredDemoTest {
     tempFile.deleteOnExit();
     Files.writeString(tempFile.toPath(), "Hello from REST Assured!");
 
-    MultipartApiClient multipartClient = new MultipartApiClient();
-
-    Response response = multipartClient
+    Response response = multipartApiClient
       .uploadFile(HTTPBIN_URL + "/post", 200, tempFile, "file", new HashMap<>())
       .extract().response();
 
@@ -810,9 +807,7 @@ public class RestAssuredDemoTest {
     File file = new File(Objects.requireNonNull(getClass().getClassLoader()
       .getResource("test-data/sample.txt")).getFile());
 
-    MultipartApiClient multipartClient = new MultipartApiClient();
-
-    Response response = multipartClient
+    Response response = multipartApiClient
       .uploadFile(HTTPBIN_URL + "/post", 200, file, "file", new HashMap<>())
       .extract().response();
 
