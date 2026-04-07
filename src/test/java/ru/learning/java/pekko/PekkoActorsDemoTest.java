@@ -1,4 +1,4 @@
-package ru.learning.java;
+package ru.learning.java.pekko;
 
 import io.qameta.allure.*;
 import org.apache.pekko.actor.typed.ActorSystem;

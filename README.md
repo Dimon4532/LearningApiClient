@@ -13,6 +13,7 @@
 - [О проекте](#-о-проекте)
 - [Технологии](#-технологии)
 - [Быстрый старт](#-быстрый-старт)
+- [Структура проекта](#-структура-проекта)
 - [Примеры использования](#-примеры-использования)
 - [API Клиенты](#-api-клиенты)
 - [Тестовые сценарии](#-тестовые-сценарии)
@@ -25,12 +26,12 @@
 
 Этот проект создан для обучения и демонстрации лучших практик тестирования REST API в Java. Он включает:
 
-- ✅ **39+ готовых тестовых сценариев** для различных HTTP методов и типов аутентификации
-- ✅ **Гибкую архитектуру** с паттерном Page Object (API Client)
+- ✅ **55+ готовых тестовых сценариев** для различных HTTP методов и типов аутентификации
+- ✅ **Гибкую архитектуру** с паттерном API Client и единым базовым классом `BaseApiTest`
 - ✅ **Интеграцию с Allure** для красивых отчетов
 - ✅ **Акторную модель** с Apache Pekko для асинхронных запросов
 - ✅ **Поддержку различных типов аутентификации** (Basic Auth, Bearer Token)
-- ✅ **Работу с различными форматами** (JSON, Form Data)
+- ✅ **Работу с различными форматами** (JSON, Form Data, Multipart, XML, SOAP)
 
 ## 🛠 Технологии
 
@@ -44,6 +45,7 @@
 | **Apache Pekko** | 1.1.3   | Акторная модель для асинхронности    |
 | **Lombok**       | 1.18.40 | Уменьшение boilerplate кода          |
 | **Jackson**      | 2.21.2  | JSON сериализация/десериализация     |
+| **JAXB**         | 2.3.1   | XML сериализация/десериализация      |
 | **Logback**      | 1.5.32  | Логирование                          |
 | **Maven**        | -       | Система сборки                       |
 
@@ -58,15 +60,74 @@
 ### Установка
 
 1. **Клонируйте репозиторий:**
-   bash git clone <your-repo-url> cd test-project-3
+   ```bash
+   git clone <your-repo-url>
+   cd test-project-3
+   ```
 2. **Соберите проект:**
-   bash mvn clean install
+   ```bash
+   mvn clean install
+   ```
 3. **Запустите тесты:**
-   bash mvn test
+   ```bash
+   mvn test
+   ```
 4. **Сгенерируйте Allure отчет:**
-   bash mvn allure:report
+   ```bash
+   mvn allure:report
+   ```
 5. **Откройте отчет:**
-   bash mvn allure:serve
+   ```bash
+   mvn allure:serve
+   ```
+
+## 📁 Структура проекта
+```
+src/
+├── main/
+│   ├── java/ru/learning/java/
+│   │   ├── actors/                          # Акторная модель (Apache Pekko)
+│   │   │   ├── HttpRequestActor.java        # Актор: выполняет HTTP запрос и возвращает ответ
+│   │   │   └── HttpSupervisor.java          # Супервизор: управляет запуском акторов
+│   │   ├── clients/api/                     # API клиенты (паттерн API Client)
+│   │   │   ├── base/
+│   │   │   │   └── Specification.java       # Базовые Request/Response спецификации REST Assured
+│   │   │   ├── ApiClient.java               # Базовый клиент: GET, POST, PUT, PATCH, DELETE
+│   │   │   ├── AuthApiClient.java           # Клиент с аутентификацией: Basic Auth + Bearer Token
+│   │   │   ├── FormApiClient.java           # Клиент для form-data (application/x-www-form-urlencoded)
+│   │   │   ├── MultipartApiClient.java      # Клиент для загрузки файлов (multipart/form-data)
+│   │   │   └── SoapApiClient.java           # Клиент для SOAP запросов (text/xml)
+│   │   ├── config/                          # Конфигурация приложения
+│   │   │   ├── AppConfig.java               # Синглтон: читает параметры из application.conf
+│   │   │   └── PropsConfig.java             # Точка доступа к конфигурации
+│   │   └── models/                          # Модели данных (Java Records + Lombok)
+│   │       ├── Comment.java                 # Модель комментария (Record)
+│   │       ├── CreateUserRequest.java       # Модель запроса создания пользователя (Lombok Builder)
+│   │       ├── Post.java                    # Модель поста (Record)
+│   │       ├── User.java                    # Модель пользователя (Record)
+│   │       └── UserXml.java                 # Модель пользователя для XML/JAXB сериализации
+│   └── resources/
+│       └── application.conf                 # Конфигурация: URL, SSL, параметры подключения
+└── test/
+    ├── java/ru/learning/java/
+    │   ├── allure/
+    │   │   └── AllureIntegrationTest.java   # Демонстрация возможностей Allure (шаги, вложения)
+    │   ├── clients/api/                     # Тесты API клиентов
+    │   │   ├── base/
+    │   │   │   ├── BaseApiTest.java         # Базовый класс тестов: инициализация клиентов и констант
+    │   │   │   └── TestSpecification.java   # Вспомогательные спецификации для тестов
+    │   │   ├── ApiClientTest.java           # Тесты базовых HTTP операций (22 теста)
+    │   │   ├── AuthApiClientTest.java       # Тесты Basic Auth и Bearer Token (14 тестов)
+    │   │   ├── FormApiClientTest.java       # Тесты form-data запросов (7 тестов)
+    │   │   ├── MultipartApiClientTest.java  # Тесты загрузки файлов (4 теста)
+    │   │   ├── SoapApiClientTest.java       # Тесты SOAP сервисов (2 теста)
+    │   │   └── XmlApiTest.java              # Тесты работы с XML и JAXB (4 теста)
+    │   └── pekko/
+    │       └── PekkoActorsDemoTest.java     # Тесты асинхронных запросов через акторы
+    └── resources/
+        └── test-data/
+            └── sample.txt                   # Файл для тестов загрузки (MultipartApiClientTest)
+```
 
 ## 💡 Примеры использования
 
@@ -79,10 +140,11 @@
 @DisplayName("1. Простой GET запрос - получение списка пользователей")
 @Description("Демонстрация базового GET запроса и валидации статус кода")
 void testSimpleGetRequest() {
-   Response response = apiClient.sendGet(BASE_URL + "/users", new HashMap<>(), new HashMap<>(), new HashMap<>(), new HashMap<>()).extract().response();
-   
+   Response response = apiClient
+           .sendGet(BASE_URL + "/users", new HashMap<>(), new HashMap<>(), new HashMap<>(), new HashMap<>())
+           .extract().response();
+
    assertThat(response.statusCode()).isEqualTo(200);
-   
    assertThat(response.jsonPath().getList("$")).isNotEmpty();
 }
 ```
@@ -97,9 +159,52 @@ void testSimpleGetRequest() {
 void testPostRequestWithObject() throws JsonProcessingException {
    Post newPost = new Post(1L, null, "My Test Post", "Content of my test post");
 
-   Response response = apiClient.sendPost(BASE_URL + "/posts", 201, objectMapper.writeValueAsString(newPost), new HashMap<>(), new HashMap<>(), new HashMap<>()).extract().response();
+   Response response = apiClient
+           .sendPost(BASE_URL + "/posts", 201, objectMapper.writeValueAsString(newPost),
+                   new HashMap<>(), new HashMap<>(), new HashMap<>())
+           .extract().response();
 
    assertThat(response.jsonPath().getInt("id")).isGreaterThan(0);
+}
+```
+
+### Загрузка файла (Multipart)
+```java 
+@Test
+@Story("Multipart")
+@DisplayName("1. Загрузка текстового файла")
+void testUploadTextFile() throws IOException {
+    File tempFile = File.createTempFile("test-upload", ".txt");
+    tempFile.deleteOnExit();
+    Files.writeString(tempFile.toPath(), "Hello from REST Assured!");
+
+    Response response = multipartApiClient
+            .uploadFile(HTTPBIN_URL + "/post", 200, tempFile, "file", new HashMap<>())
+            .extract().response();
+
+    assertThat(response.jsonPath().getString("files.file")).isEqualTo("Hello from REST Assured!");
+}
+```
+
+### GET запрос через актор (Apache Pekko)
+```java
+@Test
+@Story("Акторы")
+@DisplayName("1. Выполнение GET запроса через актор")
+@Description("Демонстрация асинхронного выполнения GET запроса")
+void testGetRequestWithActor() throws ExecutionException, InterruptedException {
+   CompletionStage<HttpRequestActor.Response> result = AskPattern.ask(
+           actorSystem,
+           replyTo -> new HttpSupervisor.StartRequest("req-1", BASE_URL + "/users/1", replyTo),
+           Duration.ofSeconds(10),
+           actorSystem.scheduler()
+   );
+
+   HttpRequestActor.Response response = result.toCompletableFuture().get();
+
+   assertThat(response.success()).isTrue();
+   assertThat(response.statusCode()).isEqualTo(200);
+   assertThat(response.body()).contains("\"id\": 1");
 }
 ```
 
@@ -121,42 +226,73 @@ void testPostRequestWithObject() throws JsonProcessingException {
 
 ### FormApiClient (для form-data)
 Работа с `application/x-www-form-urlencoded`:
-- `sendPostWithFormParams()` - POST с form параметрами
+- `sendGetWithFormParams()` - GET с form параметрами и cookies
+- `sendPostWithFormParams()` - POST с form параметрами (с cookies и без)
 - `sendPutWithFormParams()` - PUT с form параметрами
 - `sendPatchWithFormParams()` - PATCH с form параметрами
 
+### MultipartApiClient (для загрузки файлов)
+Работа с multipart/form-data:
+- `uploadFile()` - загрузка файла
+- `uploadFileWithFormData()` - загрузка файла с дополнительными полями формы
+
+### SoapApiClient (для SOAP сервисов)
+Работа с SOAP-запросами:
+- `sendSoapRequest()` - отправка SOAP-запроса с text/xml
+
 ## 🧪 Тестовые сценарии
+Тесты организованы по принципу «один клиент = один тестовый класс» и наследуются от общего BaseApiTest.
 
-Проект включает **39 тестов**, сгруппированных по темам:
-
-### 1-13: Базовые операции (ApiClient)
-- ✅ GET запросы (простые, с параметрами, с path params)
-- ✅ POST запросы (JSON, объекты)
-- ✅ PUT/PATCH запросы
+### ApiClientTest (22 теста) — базовые HTTP операции
+- ✅ GET запросы (простые, с path params, с query params)
+- ✅ POST запросы (JSON строка, Java объект)
+- ✅ PUT запросы (полное обновление)
+- ✅ PATCH запросы (частичное обновление)
 - ✅ DELETE запросы
-- ✅ Валидация JSON структуры
-- ✅ Десериализация в объекты
+- ✅ Валидация JSON структуры с Hamcrest матчерами
+- ✅ Десериализация ответа в Java объекты
 - ✅ Проверка заголовков и времени ответа
+- ✅ Негативные тесты (404)
+- ✅ Работа с моделью Comment
+- ✅ Создание пользователей (Builder pattern и конструктор)
+- ✅ Комплексные сценарии (создание поста + получение комментариев)
+- ✅ Демонстрация наследования клиентов (AuthApiClient, FormApiClient)
 
-### 14-19: Basic Authentication (AuthApiClient)
-- ✅ GET с Basic Auth (успех/провал)
-- ✅ POST/PUT/PATCH/DELETE с Basic Auth
-
-### 20-24: Form Parameters (FormApiClient)
-- ✅ POST с form parameters
-- ✅ Работа с cookies
-- ✅ PUT/PATCH с form data
-
-### 25-31: Комплексные сценарии
-- ✅ Работа с комментариями
-- ✅ Создание пользователей (Builder pattern)
-- ✅ Интеграционные тесты
-
-### 32-39: Bearer Token Authentication
-- ✅ Получение токена
+### AuthApiClientTest (14 тестов) — аутентификация
+- ✅ GET/POST/PUT/PATCH/DELETE с Basic Auth
+- ✅ Негативный тест (401 без credentials)
+- ✅ Получение Bearer токена
 - ✅ GET/POST/PUT/PATCH/DELETE с Bearer Token
 - ✅ Полный цикл аутентификации
-- ✅ Негативные тесты
+- ✅ Негативный тест (401 без токена)
+
+### FormApiClientTest (7 тестов) — form-data
+- ✅ POST с form parameters (с cookies и без)
+- ✅ GET с form parameters
+- ✅ PUT с form parameters (простой и с session cookie)
+- ✅ PATCH с form parameters
+
+### MultipartApiClientTest (4 теста) — загрузка файлов
+- ✅ Загрузка временного файла с проверкой содержимого
+- ✅ Загрузка файла из classpath
+- ✅ Загрузка файла с дополнительными полями формы
+- ✅ Inline multipart без клиента
+
+### XmlApiTest (4 теста) — работа с XML
+- ✅ Парсинг XML-ответа через xmlPath()
+- ✅ Валидация XML через Hamcrest hasXPath()
+- ✅ POST запрос с XML-телом
+- ✅ POST с JAXB-объектом (автоматическая сериализация)
+
+### SoapApiClientTest (2 теста) — SOAP сервисы
+- ✅ Вызов SOAP-метода NumberToWords и парсинг ответа
+- ✅ Валидация SOAP-ответа через XPath
+
+### AllureIntegrationTest — демонстрация Allure
+- ✅ Примеры использования аннотаций и вложений Allure
+
+### PekkoActorsDemoTest — акторная модель
+- ✅ Асинхронные HTTP запросы через Apache Pekko акторы
 
 ## 📊 Allure отчеты
 
@@ -196,9 +332,9 @@ void testGetRequestWithActor() throws ExecutionException, InterruptedException {
 ### 🎓 Уровень 1: Базовые улучшения
 
 1. **Расширение покрытия API**
-   - Добавить тесты для файловой загрузки (multipart/form-data)
-   - Работа с XML (кроме JSON)
-   - Тесты для SOAP сервисов
+   - ~~Добавить тесты для файловой загрузки (multipart/form-data)~~ → `MultipartApiClientTest`
+   - ~~Работа с XML (кроме JSON)~~ → `XmlApiTest`
+   - ~~Тесты для SOAP сервисов~~ → `SoapApiClientTest`
 
 2. **Больше типов аутентификацией**
    - OAuth 2.0 (полный flow)

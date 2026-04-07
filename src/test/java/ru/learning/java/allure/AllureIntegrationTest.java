@@ -1,4 +1,4 @@
-package ru.learning.java;
+package ru.learning.java.allure;
 
 import io.qameta.allure.*;
 import io.restassured.response.Response;
