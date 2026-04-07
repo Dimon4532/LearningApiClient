@@ -35,6 +35,8 @@
         <allure.version>2.32.0</allure.version>
         <!-- JUnit 5 -->
         <junit.version>5.11.4</junit.version>
+        <!-- JUnit Platform Suite -->
+        <junit-platform-suite.version>1.14.3</junit-platform-suite.version>
         <!-- AssertJ -->
         <assertj.version>3.27.7</assertj.version>
 
@@ -133,6 +135,14 @@
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter</artifactId>
             <version>${junit.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- JUnit Platform Suite -->
+        <dependency>
+            <groupId>org.junit.platform</groupId>
+            <artifactId>junit-platform-suite</artifactId>
+            <version>${junit-platform-suite.version}</version>
             <scope>test</scope>
         </dependency>
 
