@@ -3,13 +3,11 @@ package ru.learning.java;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.qameta.allure.*;
+import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.*;
 import ru.learning.java.clients.api.*;
-import ru.learning.java.models.Comment;
-import ru.learning.java.models.CreateUserRequest;
-import ru.learning.java.models.Post;
-import ru.learning.java.models.User;
+import ru.learning.java.models.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -19,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.*;
 
@@ -30,7 +29,6 @@ import static org.hamcrest.Matchers.*;
 @DisplayName("Примеры тестирования API с REST Assured")
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class RestAssuredDemoTest {
-
   private static ApiClient apiClient;
   private static AuthApiClient authApiClient;
   private static FormApiClient formApiClient;
@@ -40,6 +38,8 @@ public class RestAssuredDemoTest {
 
   private static final String BASE_URL = "https://jsonplaceholder.typicode.com";
   private static final String HTTPBIN_URL = "https://httpbin.org";
+
+  private static final String SOAP_URL = "https://www.dataaccess.com/webservicesserver/NumberConversion.wso";
 
   @BeforeAll
   static void setUp() {
@@ -190,6 +190,32 @@ public class RestAssuredDemoTest {
     pathParams.put("postId", "1");
 
     apiClient.sendPatch(BASE_URL + "/posts/{postId}", 200, patchBody, new HashMap<>(), pathParams, new HashMap<>()).assertThat().body("title", equalTo("Partially Updated Title")).body("id", equalTo(1));
+  }
+
+  @Test
+  @Order(9_1)
+  @Story("PATCH запросы")
+  @DisplayName("9.1 PATCH — частичное обновление через httpbin")
+  @Description("Обновление только статуса")
+  void testPatchOnHttpbin() {
+    String patchBody = """
+      {
+          "status": "reviewed"
+      }
+      """;
+
+    apiClient.sendPatch(HTTPBIN_URL + "/patch", 200, patchBody, new HashMap<>(), new HashMap<>(), new HashMap<>()).assertThat().body("json.status", equalTo("reviewed"));
+  }
+
+  @Test
+  @Order(9_2)
+  @Story("PATCH запросы")
+  @DisplayName("9.2 PATCH — частичное обновление через Map и ObjectMapper")
+  void testPatchOnHttpbinWithMap() throws JsonProcessingException {
+    Map<String, String> patch = new HashMap<>();
+    patch.put("status", "reviewed");
+
+    apiClient.sendPatch(HTTPBIN_URL + "/patch", 200, objectMapper.writeValueAsString(patch), new HashMap<>(), new HashMap<>(), new HashMap<>()).assertThat().body("json.status", equalTo("reviewed"));
   }
 
   @Test
@@ -418,6 +444,40 @@ public class RestAssuredDemoTest {
   }
 
   @Test
+  @Order(23_1)
+  @Story("Form Parameters")
+  @DisplayName("23.1 PUT с form params — обновление данных сотрудника")
+  @Description("PUT запрос с form-encoded данными")
+  void testPutFormParamsEmployee() {
+    Map<String, String> formParams = new HashMap<>();
+    formParams.put("role", "senior");
+    formParams.put("department", "QA");
+
+    formApiClient.sendPutWithFormParams(HTTPBIN_URL + "/put", new HashMap<>(), new HashMap<>(), formParams).assertThat().statusCode(200).body("form.role", equalTo("senior")).body("form.department", equalTo("QA"));
+  }
+
+  @Test
+  @Order(23_2)
+  @Story("Form Parameters")
+  @DisplayName("23.2 PUT с form params и session cookie")
+  @Description("PUT запрос с form-encoded данными и использованием cookie")
+  void testPutFormParamsWithSession() {
+    Map<String, String> formParams = new HashMap<>();
+    formParams.put("role", "senior");
+    formParams.put("department", "QA");
+
+    Map<String, String> cookies = new HashMap<>();
+    cookies.put("session_id", "sess-abc-999");
+
+    Response response = formApiClient.sendPutWithFormParams(HTTPBIN_URL + "/put", new HashMap<>(), cookies, formParams).extract().response();
+
+    assertThat(response.jsonPath().getString("form.role")).isEqualTo("senior");
+    assertThat(response.jsonPath().getString("form.department")).isEqualTo("QA");
+    // проверяем что cookie дошла до сервера
+    assertThat(response.jsonPath().getString("headers.Cookie")).contains("session_id");
+  }
+
+  @Test
   @Order(24)
   @Story("Form Parameters")
   @DisplayName("24. PATCH запрос с form parameters")
@@ -575,14 +635,7 @@ public class RestAssuredDemoTest {
       }
       """;
 
-    Response response = authApiClient.sendPostForToken(
-      HTTPBIN_URL + "/post",
-      200,
-      requestBody,
-      new HashMap<>(),
-      new HashMap<>(),
-      new HashMap<>()
-    ).extract().response();
+    Response response = authApiClient.sendPostForToken(HTTPBIN_URL + "/post", 200, requestBody, new HashMap<>(), new HashMap<>(), new HashMap<>()).extract().response();
 
     // httpbin возвращает отправленные данные обратно
     assertThat(response.jsonPath().getString("json.username")).isEqualTo("testuser");
@@ -597,14 +650,7 @@ public class RestAssuredDemoTest {
   void testGetWithBearerToken() {
     String token = "my-test-bearer-token-12345";
 
-    Response response = authApiClient.sendGetWithBearerToken(
-      HTTPBIN_URL + "/bearer",
-      200,
-      token,
-      new HashMap<>(),
-      new HashMap<>(),
-      new HashMap<>()
-    ).extract().response();
+    Response response = authApiClient.sendGetWithBearerToken(HTTPBIN_URL + "/bearer", 200, token, new HashMap<>(), new HashMap<>(), new HashMap<>()).extract().response();
 
     // httpbin /bearer endpoint проверяет токен
     assertThat(response.jsonPath().getBoolean("authenticated")).isTrue();
@@ -625,15 +671,7 @@ public class RestAssuredDemoTest {
       }
       """;
 
-    Response response = authApiClient.sendPostWithBearerToken(
-      HTTPBIN_URL + "/post",
-      200,
-      token,
-      requestBody,
-      new HashMap<>(),
-      new HashMap<>(),
-      new HashMap<>()
-    ).extract().response();
+    Response response = authApiClient.sendPostWithBearerToken(HTTPBIN_URL + "/post", 200, token, requestBody, new HashMap<>(), new HashMap<>(), new HashMap<>()).extract().response();
 
     assertThat(response.jsonPath().getString("json.action")).isEqualTo("create");
     assertThat(response.jsonPath().getString("json.resource")).isEqualTo("user-profile");
@@ -655,15 +693,7 @@ public class RestAssuredDemoTest {
       }
       """;
 
-    Response response = authApiClient.sendPutWithBearerToken(
-      HTTPBIN_URL + "/put",
-      200,
-      token,
-      updateBody,
-      new HashMap<>(),
-      new HashMap<>(),
-      new HashMap<>()
-    ).extract().response();
+    Response response = authApiClient.sendPutWithBearerToken(HTTPBIN_URL + "/put", 200, token, updateBody, new HashMap<>(), new HashMap<>(), new HashMap<>()).extract().response();
 
     assertThat(response.jsonPath().getString("json.status")).isEqualTo("active");
     assertThat(response.jsonPath().getString("json.updated_by")).isEqualTo("token_user");
@@ -683,15 +713,7 @@ public class RestAssuredDemoTest {
       }
       """;
 
-    Response response = authApiClient.sendPatchWithBearerToken(
-      HTTPBIN_URL + "/patch",
-      200,
-      token,
-      patchBody,
-      new HashMap<>(),
-      new HashMap<>(),
-      new HashMap<>()
-    ).extract().response();
+    Response response = authApiClient.sendPatchWithBearerToken(HTTPBIN_URL + "/patch", 200, token, patchBody, new HashMap<>(), new HashMap<>(), new HashMap<>()).extract().response();
 
     assertThat(response.jsonPath().getString("json.email")).isEqualTo("newemail@example.com");
     assertThat(response.jsonPath().getString("headers.Authorization")).contains("Bearer");
@@ -705,14 +727,7 @@ public class RestAssuredDemoTest {
   void testDeleteWithBearerToken() {
     String token = "delete-token-ghi789";
 
-    Response response = authApiClient.sendDeleteWithBearerToken(
-      HTTPBIN_URL + "/delete",
-      200,
-      token,
-      new HashMap<>(),
-      new HashMap<>(),
-      new HashMap<>()
-    ).extract().response();
+    Response response = authApiClient.sendDeleteWithBearerToken(HTTPBIN_URL + "/delete", 200, token, new HashMap<>(), new HashMap<>(), new HashMap<>()).extract().response();
 
     assertThat(response.statusCode()).isEqualTo(200);
     assertThat(response.jsonPath().getString("headers.Authorization")).contains("Bearer");
@@ -733,14 +748,7 @@ public class RestAssuredDemoTest {
       }
       """;
 
-    Response loginResponse = authApiClient.sendPostForToken(
-      HTTPBIN_URL + "/post",
-      200,
-      loginBody,
-      new HashMap<>(),
-      new HashMap<>(),
-      new HashMap<>()
-    ).extract().response();
+    Response loginResponse = authApiClient.sendPostForToken(HTTPBIN_URL + "/post", 200, loginBody, new HashMap<>(), new HashMap<>(), new HashMap<>()).extract().response();
 
     assertThat(loginResponse.statusCode()).isEqualTo(200);
 
@@ -748,14 +756,7 @@ public class RestAssuredDemoTest {
     String token = "simulated-token-from-login";
 
     // Шаг 3: Делаем GET запрос с токеном
-    Response dataResponse = authApiClient.sendGetWithBearerToken(
-      HTTPBIN_URL + "/bearer",
-      200,
-      token,
-      new HashMap<>(),
-      new HashMap<>(),
-      new HashMap<>()
-    ).extract().response();
+    Response dataResponse = authApiClient.sendGetWithBearerToken(HTTPBIN_URL + "/bearer", 200, token, new HashMap<>(), new HashMap<>(), new HashMap<>()).extract().response();
 
     assertThat(dataResponse.jsonPath().getBoolean("authenticated")).isTrue();
     assertThat(dataResponse.jsonPath().getString("token")).isEqualTo(token);
@@ -769,13 +770,7 @@ public class RestAssuredDemoTest {
   void testInvalidBearerToken() {
     // httpbin /bearer требует правильный формат токена
 
-    Response response = authApiClient.sendGet(
-      HTTPBIN_URL + "/bearer",
-      new HashMap<>(),
-      new HashMap<>(),
-      new HashMap<>(),
-      new HashMap<>()
-    ).extract().response();
+    Response response = authApiClient.sendGet(HTTPBIN_URL + "/bearer", new HashMap<>(), new HashMap<>(), new HashMap<>(), new HashMap<>()).extract().response();
 
     // Без токена должен вернуться 401
     assertThat(response.statusCode()).isEqualTo(401);
@@ -792,13 +787,10 @@ public class RestAssuredDemoTest {
     tempFile.deleteOnExit();
     Files.writeString(tempFile.toPath(), "Hello from REST Assured!");
 
-    Response response = multipartApiClient
-      .uploadFile(HTTPBIN_URL + "/post", 200, tempFile, "file", new HashMap<>())
-      .extract().response();
+    Response response = multipartApiClient.uploadFile(HTTPBIN_URL + "/post", 200, tempFile, "file", new HashMap<>()).extract().response();
 
     // httpbin возвращает содержимое файла в поле "files"
-    assertThat(response.jsonPath().getString("files.file"))
-      .isEqualTo("Hello from REST Assured!");
+    assertThat(response.jsonPath().getString("files.file")).isEqualTo("Hello from REST Assured!");
   }
 
   @Test
@@ -806,13 +798,140 @@ public class RestAssuredDemoTest {
   @Story("Multipart")
   @DisplayName("41. Загрузка файла из classpath")
   void testUploadFileFromClasspath() {
-    File file = new File(Objects.requireNonNull(getClass().getClassLoader()
-      .getResource("test-data/sample.txt")).getFile());
+    File file = new File(Objects.requireNonNull(getClass().getClassLoader().getResource("test-data/sample.txt")).getFile());
 
-    Response response = multipartApiClient
-      .uploadFile(HTTPBIN_URL + "/post", 200, file, "file", new HashMap<>())
-      .extract().response();
+    Response response = multipartApiClient.uploadFile(HTTPBIN_URL + "/post", 200, file, "file", new HashMap<>()).extract().response();
 
     assertThat(response.jsonPath().getString("files.file")).isNotEmpty();
+  }
+
+  @Test
+  @Order(42)
+  @Story("Multipart")
+  @DisplayName("42. Файл + поля формы")
+  void testUploadFileWithMetadata() throws IOException {
+    File tempFile = File.createTempFile("doc", ".txt");
+    tempFile.deleteOnExit();
+    Files.writeString(tempFile.toPath(), "Document content");
+
+    Map<String, String> formFields = Map.of("author", "John Doe", "description", "Test document");
+
+    Response response = multipartApiClient.uploadFileWithFormData(HTTPBIN_URL + "/post", 200, tempFile, "file", formFields, new HashMap<>()).extract().response();
+
+    assertThat(response.jsonPath().getString("form.author")).isEqualTo("John Doe");
+    assertThat(response.jsonPath().getString("form.description")).isEqualTo("Test document");
+  }
+
+  @Test
+  @Order(43)
+  @Story("Multipart")
+  @DisplayName("43. Inline multipart без клиента")
+  void testMultipartInline() throws IOException {
+    File tempFile = File.createTempFile("inline", ".json");
+    tempFile.deleteOnExit();
+    Files.writeString(tempFile.toPath(), "{\"key\":\"value\"}");
+
+    Response response = given().multiPart("file", tempFile, "application/json").multiPart("category", "test-category").post(HTTPBIN_URL + "/post").then().statusCode(200).extract().response();
+
+    assertThat(response.jsonPath().getString("form.category")).isEqualTo("test-category");
+  }
+
+  @Test
+  @Order(44)
+  @Story("XML")
+  @DisplayName("44. Получение XML и извлечение значения тега")
+  void testParseXmlResponse() {
+    Response response = apiClient.sendGet(HTTPBIN_URL + "/xml", new HashMap<>(), new HashMap<>(), new HashMap<>(), new HashMap<>()).extract().response();
+
+    // httpbin /xml возвращает slideshow XML
+    String title = response.xmlPath().getString("slideshow.@title");
+    assertThat(title).isNotEmpty();
+
+    // Количество slides
+    int slideCount = response.xmlPath().getList("slideshow.slide").size();
+    assertThat(slideCount).isGreaterThan(0);
+  }
+
+  @Test
+  @Order(45)
+  @Story("XML")
+  @DisplayName("45. Валидация XML через Hamcrest hasXPath")
+  void testXmlValidationWithHamcrest() {
+    apiClient.sendGet(HTTPBIN_URL + "/xml", new HashMap<>(), new HashMap<>(), new HashMap<>(), new HashMap<>()).assertThat().statusCode(200).contentType(ContentType.XML).body(hasXPath("/slideshow/@title")).body(hasXPath("//slide"));
+  }
+
+  @Test
+  @Order(46)
+  @Story("XML")
+  @DisplayName("46. POST запрос с XML телом")
+  void testPostWithXmlBody() {
+    String xmlBody = """
+      <?xml version="1.0" encoding="UTF-8"?>
+      <user>
+          <name>John Doe</name>
+          <email>john@example.com</email>
+      </user>
+      """;
+
+    Response response = given().contentType(ContentType.XML).body(xmlBody).post(HTTPBIN_URL + "/post").then().statusCode(200).extract().response();
+
+    // httpbin возвращает тело в поле "data"
+    assertThat(response.jsonPath().getString("data")).contains("<name>John Doe</name>");
+  }
+
+  @Test
+  @Order(47)
+  @Story("XML")
+  @DisplayName("47. POST с JAXB объектом")
+  void testPostWithJaxbObject() {
+    UserXml user = new UserXml("Jane Smith", "jane@example.com");
+
+    Response response = given().contentType(ContentType.XML).body(user) // REST Assured сериализует через JAXB
+      .post(HTTPBIN_URL + "/post").then().statusCode(200).extract().response();
+
+    assertThat(response.jsonPath().getString("data")).contains("Jane Smith");
+  }
+
+  @Test
+  @Order(48)
+  @Story("SOAP")
+  @DisplayName("48. SOAP — конвертация числа в слова")
+  void testSoapNumberToWords() {
+    String envelope = """
+      <?xml version="1.0" encoding="utf-8"?>
+      <soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+        <soap:Body>
+          <NumberToWords xmlns="http://www.dataaccess.com/webservicesserver/">
+            <ubiNum>42</ubiNum>
+          </NumberToWords>
+        </soap:Body>
+      </soap:Envelope>
+      """;
+
+    Response response = soapApiClient.sendSoapRequest(SOAP_URL, envelope, "http://www.dataaccess.com/webservicesserver/NumberToWords", new HashMap<>()).extract().response();
+
+    // XPath для извлечения результата из SOAP-ответа
+    String result = response.xmlPath().getString("Envelope.Body.NumberToWordsResponse.NumberToWordsResult");
+
+    assertThat(result).containsIgnoringCase("forty");
+  }
+
+  @Test
+  @Order(49)
+  @Story("SOAP")
+  @DisplayName("49. SOAP — валидация ответа через XPath")
+  void testSoapResponseWithXPath() {
+    String envelope = """
+      <?xml version="1.0" encoding="utf-8"?>
+      <soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+        <soap:Body>
+          <NumberToDollars xmlns="http://www.dataaccess.com/webservicesserver/">
+            <dNum>100</dNum>
+          </NumberToDollars>
+        </soap:Body>
+      </soap:Envelope>
+      """;
+
+    soapApiClient.sendSoapRequest(SOAP_URL, envelope, "http://www.dataaccess.com/webservicesserver/NumberToDollars", new HashMap<>()).assertThat().statusCode(200).body(hasXPath("//*[local-name()='NumberToDollarsResult']"));
   }
 }

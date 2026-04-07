@@ -21,6 +21,10 @@
         <!-- Jackson -->
         <jackson.version>2.21.2</jackson.version>
         <jackson-annotations.version>2.21</jackson-annotations.version>
+        <!-- JAXB API for XML binding -->
+        <jaxb-api.version>2.3.1</jaxb-api.version>
+        <!-- JAXB Implementation -->
+        <jaxb-impl.version>2.3.9</jaxb-impl.version>
         <!-- Commons Codec -->
         <commons-codec.version>1.17.1</commons-codec.version>
         <!-- Typesafe Config -->
@@ -79,6 +83,20 @@
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-annotations</artifactId>
             <version>${jackson-annotations.version}</version>
+        </dependency>
+
+        <!-- JAXB API for XML binding -->
+        <dependency>
+            <groupId>javax.xml.bind</groupId>
+            <artifactId>jaxb-api</artifactId>
+            <version>${jaxb-api.version}</version>
+        </dependency>
+
+        <!-- JAXB Implementation -->
+        <dependency>
+            <groupId>com.sun.xml.bind</groupId>
+            <artifactId>jaxb-impl</artifactId>
+            <version>${jaxb-impl.version}</version>
         </dependency>
 
         <!-- Безопасная версия Commons Codec -->
