@@ -20,6 +20,7 @@ import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.*;
@@ -780,6 +781,7 @@ public class RestAssuredDemoTest {
   }
 
   // ==================== MULTIPART ТЕСТЫ ====================
+
   @Test
   @Order(40)
   @Story("Multipart")
@@ -798,5 +800,22 @@ public class RestAssuredDemoTest {
     // httpbin возвращает содержимое файла в поле "files"
     assertThat(response.jsonPath().getString("files.file"))
       .isEqualTo("Hello from REST Assured!");
+  }
+
+  @Test
+  @Order(41)
+  @Story("Multipart")
+  @DisplayName("41. Загрузка файла из classpath")
+  void testUploadFileFromClasspath() {
+    File file = new File(Objects.requireNonNull(getClass().getClassLoader()
+      .getResource("test-data/sample.txt")).getFile());
+
+    MultipartApiClient multipartClient = new MultipartApiClient();
+
+    Response response = multipartClient
+      .uploadFile(HTTPBIN_URL + "/post", 200, file, "file", new HashMap<>())
+      .extract().response();
+
+    assertThat(response.jsonPath().getString("files.file")).isNotEmpty();
   }
 }

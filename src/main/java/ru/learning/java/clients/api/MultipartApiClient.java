@@ -1,5 +1,6 @@
 package ru.learning.java.clients.api;
 
+import io.restassured.http.ContentType;
 import io.restassured.response.ValidatableResponse;
 
 import java.io.File;
@@ -25,6 +26,7 @@ public class MultipartApiClient extends ApiClient {
                                         Map<String, String> headers) {
     installSpecification(requestSpecification(), responseSpecification());
     return given()
+      .contentType(ContentType.MULTIPART)
       .headers(headers)
       .multiPart(fieldName, file)
       .when()
@@ -44,7 +46,10 @@ public class MultipartApiClient extends ApiClient {
                                                     Map<String, String> formFields,
                                                     Map<String, String> headers) {
     installSpecification(requestSpecification(), responseSpecification());
-    var request = given().headers(headers).multiPart(fieldName, file);
+    var request = given()
+      .contentType(ContentType.MULTIPART)
+      .headers(headers)
+      .multiPart(fieldName, file);
     formFields.forEach(request::multiPart);
     return request.when().post(url)
       .then().assertThat().statusCode(statusCode).log().all();
