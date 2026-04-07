@@ -46,6 +46,8 @@ public class RestAssuredDemoTest {
     apiClient = new ApiClient();
     authApiClient = new AuthApiClient();
     formApiClient = new FormApiClient();
+    multipartApiClient = new MultipartApiClient();
+    soapApiClient = new SoapApiClient();
     objectMapper = new ObjectMapper();
   }
 
