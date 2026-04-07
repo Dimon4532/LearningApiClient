@@ -258,7 +258,6 @@ public class RestAssuredDemoTest {
     assertThat(response.statusCode()).isEqualTo(401);
   }
 
-
   @Test
   @Order(16)
   @Story("Авторизация")
@@ -564,11 +563,11 @@ public class RestAssuredDemoTest {
   @Description("Демонстрация получения токена через POST запрос")
   void testGetBearerToken() {
     String requestBody = """
-            {
-                "username": "testuser",
-                "password": "testpass"
-            }
-            """;
+      {
+          "username": "testuser",
+          "password": "testpass"
+      }
+      """;
 
     Response response = authApiClient.sendPostForToken(
       HTTPBIN_URL + "/post",
@@ -614,11 +613,11 @@ public class RestAssuredDemoTest {
   void testPostWithBearerToken() {
     String token = "secure-bearer-token-xyz";
     String requestBody = """
-            {
-                "action": "create",
-                "resource": "user-profile"
-            }
-            """;
+      {
+          "action": "create",
+          "resource": "user-profile"
+      }
+      """;
 
     Response response = authApiClient.sendPostWithBearerToken(
       HTTPBIN_URL + "/post",
@@ -644,11 +643,11 @@ public class RestAssuredDemoTest {
   void testPutWithBearerToken() {
     String token = "update-token-abc123";
     String updateBody = """
-            {
-                "status": "active",
-                "updated_by": "token_user"
-            }
-            """;
+      {
+          "status": "active",
+          "updated_by": "token_user"
+      }
+      """;
 
     Response response = authApiClient.sendPutWithBearerToken(
       HTTPBIN_URL + "/put",
@@ -673,10 +672,10 @@ public class RestAssuredDemoTest {
   void testPatchWithBearerToken() {
     String token = "patch-token-def456";
     String patchBody = """
-            {
-                "email": "newemail@example.com"
-            }
-            """;
+      {
+          "email": "newemail@example.com"
+      }
+      """;
 
     Response response = authApiClient.sendPatchWithBearerToken(
       HTTPBIN_URL + "/patch",
@@ -722,11 +721,11 @@ public class RestAssuredDemoTest {
   void testCompleteTokenFlow() {
     // Шаг 1: Получаем токен (симулируем)
     String loginBody = """
-            {
-                "username": "admin",
-                "password": "admin123"
-            }
-            """;
+      {
+          "username": "admin",
+          "password": "admin123"
+      }
+      """;
 
     Response loginResponse = authApiClient.sendPostForToken(
       HTTPBIN_URL + "/post",
