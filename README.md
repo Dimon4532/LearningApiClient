@@ -26,28 +26,31 @@
 
 Этот проект создан для обучения и демонстрации лучших практик тестирования REST API в Java. Он включает:
 
-- ✅ **55+ готовых тестовых сценариев** для различных HTTP методов и типов аутентификации
+- ✅ **74 готовых тестовых сценариев** для различных HTTP методов и типов аутентификации
 - ✅ **Гибкую архитектуру** с паттерном API Client и единым базовым классом `BaseApiTest`
 - ✅ **Интеграцию с Allure** для красивых отчетов
 - ✅ **Акторную модель** с Apache Pekko для асинхронных запросов
-- ✅ **Поддержку различных типов аутентификации** (Basic Auth, Bearer Token)
+- ✅ **Поддержку различных типов аутентификации** (Basic Auth, Bearer Token, OAuth 2.0, API Keys)
 - ✅ **Работу с различными форматами** (JSON, Form Data, Multipart, XML, SOAP)
+- ✅ **WireMock** для изолированного тестирования OAuth 2.0 без внешних зависимостей
 
 ## 🛠 Технологии
 
-| Технология       | Версия  | Назначение                           |
-|------------------|---------|--------------------------------------|
-| **Java**         | 21      | Основной язык программирования       |
-| **REST Assured** | 5.5.7   | Библиотека для тестирования REST API |
-| **JUnit 5**      | 5.11.4  | Фреймворк для написания тестов       |
-| **AssertJ**      | 3.27.7  | Fluent assertions библиотека         |
-| **Allure**       | 2.32.0  | Генерация отчетов                    |
-| **Apache Pekko** | 1.1.3   | Акторная модель для асинхронности    |
-| **Lombok**       | 1.18.40 | Уменьшение boilerplate кода          |
-| **Jackson**      | 2.21.2  | JSON сериализация/десериализация     |
-| **JAXB**         | 2.3.1   | XML сериализация/десериализация      |
-| **Logback**      | 1.5.32  | Логирование                          |
-| **Maven**        | -       | Система сборки                       |
+| Технология       | Версия  | Назначение                                  |
+|------------------|---------|---------------------------------------------|
+| **Java**         | 21      | Основной язык программирования              |
+| **REST Assured** | 5.5.7   | Библиотека для тестирования REST API        |
+| **JUnit 5**      | 5.11.4  | Фреймворк для написания тестов              |
+| **AssertJ**      | 3.27.7  | Fluent assertions библиотека                |
+| **Allure**       | 2.32.0  | Генерация отчетов                           |
+| **Apache Pekko** | 1.1.3   | Акторная модель для асинхронности           |
+| **Lombok**       | 1.18.40 | Уменьшение boilerplate кода                 |
+| **Jackson**      | 2.21.2  | JSON сериализация/десериализация            |
+| **JAXB**         | 2.3.1   | XML сериализация/десериализация             |
+| **WireMock**     | 3.10.0  | Mock-сервер для изолированного тестирования |
+| **java-jwt**     | 4.4.0   | Работа с JWT токенами                       |
+| **Logback**      | 1.5.32  | Логирование                                 |
+| **Maven**        | -       | Система сборки                              |
 
 ## 🚀 Быстрый старт
 
@@ -93,17 +96,20 @@ src/
 │   │   ├── clients/api/
 │   │   │   ├── base/
 │   │   │   │   └── Specification.java
-│   │   │   ├── ApiClient.java
-│   │   │   ├── AuthApiClient.java
-│   │   │   ├── FormApiClient.java
-│   │   │   ├── MultipartApiClient.java
-│   │   │   └── SoapApiClient.java
+│   │   │   ├── ApiClient.java           ← базовые HTTP операции
+│   │   │   ├── ApiKeyClient.java        ← API Keys (header / query / Basic Auth)
+│   │   │   ├── AuthApiClient.java       ← Basic Auth + Bearer Token
+│   │   │   ├── FormApiClient.java       ← application/x-www-form-urlencoded
+│   │   │   ├── MultipartApiClient.java  ← multipart/form-data
+│   │   │   ├── OAuthApiClient.java      ← OAuth 2.0 full flow
+│   │   │   └── SoapApiClient.java       ← SOAP / text/xml
 │   │   ├── config/
 │   │   │   ├── AppConfig.java
 │   │   │   └── PropsConfig.java
 │   │   └── models/
 │   │       ├── Comment.java
 │   │       ├── CreateUserRequest.java
+│   │       ├── OAuthTokenResponse.java  ← модель ответа OAuth токена
 │   │       ├── Post.java
 │   │       ├── User.java
 │   │       └── UserXml.java
@@ -119,14 +125,16 @@ src/
     │   │   ├── base/
     │   │   │   ├── BaseApiTest.java
     │   │   │   └── SpecificationTest.java
-    │   │   ├── ApiClientTest.java
-    │   │   ├── AuthApiClientTest.java
-    │   │   ├── FormApiClientTest.java
-    │   │   ├── MultipartApiClientTest.java
-    │   │   ├── SoapApiClientTest.java
-    │   │   └── XmlApiTest.java
+    │   │   ├── ApiClientTest.java          ← 22 теста, базовые HTTP операции
+    │   │   ├── ApiKeyClientTest.java       ← 10 тестов, API Keys
+    │   │   ├── AuthApiClientTest.java      ← 14 тестов, Basic Auth + Bearer Token
+    │   │   ├── FormApiClientTest.java      ← 7 тестов, form-data
+    │   │   ├── MultipartApiClientTest.java ← 4 теста, загрузка файлов
+    │   │   ├── OAuthApiClientTest.java     ← 11 тестов, OAuth 2.0 (WireMock)
+    │   │   ├── SoapApiClientTest.java      ← 2 теста, SOAP
+    │   │   └── XmlApiTest.java             ← 4 теста, XML
     │   └── suites/
-    │       └── ApiTestSuite.java
+    │       └── ApiTestSuite.java         ← запуск всех тестов одной командой
     └── resources/
         └── test-data/
             └── sample.txt
@@ -134,19 +142,19 @@ src/
 
 ### Описание ключевых пакетов
 
-| Путь                            | Описание                                                            |
-|---------------------------------|---------------------------------------------------------------------|
-| `main/.../actors/`              | Акторная модель (Apache Pekko): актор HTTP-запроса и супервизор     |
-| `main/.../clients/api/`         | API клиенты: базовый, с аутентификацией, form-data, multipart, SOAP |
-| `main/.../clients/api/base/`    | Базовые Request/Response спецификации REST Assured                  |
-| `main/.../config/`              | Конфигурация приложения (читает `application.conf`)                 |
-| `main/.../models/`              | Модели данных: Java Records + Lombok Builder                        |
-| `test/.../actors/`              | Тесты акторной модели (4 теста, Apache Pekko)                       |
-| `test/.../allure/`              | Демонстрация возможностей Allure: шаги, вложения, аннотации         |
-| `test/.../clients/api/`         | Тесты всех API клиентов (53+ теста)                                 |
-| `test/.../clients/api/base/`    | Базовый класс тестов и вспомогательные спецификации                 |
-| `test/.../suites/`              | JUnit Suite для запуска всех API тестов одной командой              |
-| `test/.../resources/test-data/` | Тестовые файлы для multipart-загрузки                               |
+| Путь                            | Описание                                                                   |
+|---------------------------------|----------------------------------------------------------------------------|
+| `main/.../actors/`              | Акторная модель (Apache Pekko): актор HTTP-запроса и супервизор            |
+| `main/.../clients/api/`         | API клиенты: базовый, аутентификация, OAuth 2.0, API Keys, form-data, SOAP |
+| `main/.../clients/api/base/`    | Базовые Request/Response спецификации REST Assured                         |
+| `main/.../config/`              | Конфигурация приложения (читает `application.conf`)                        |
+| `main/.../models/`              | Модели данных: Java Records + Lombok Builder, OAuthTokenResponse           |
+| `test/.../actors/`              | Тесты акторной модели (4 теста, Apache Pekko)                              |
+| `test/.../allure/`              | Демонстрация возможностей Allure: шаги, вложения, аннотации                |
+| `test/.../clients/api/`         | Тесты всех API клиентов (80+ тестов)                                       |
+| `test/.../clients/api/base/`    | Базовый класс тестов и вспомогательные спецификации                        |
+| `test/.../suites/`              | JUnit Suite для запуска всех API тестов одной командой                     |
+| `test/.../resources/test-data/` | Тестовые файлы для multipart-загрузки                                      |
 
 ## 💡 Примеры использования
 
@@ -189,6 +197,56 @@ void testPostRequestWithObject() throws JsonProcessingException {
     .extract().response();
 
   assertThat(response.jsonPath().getInt("id")).isGreaterThan(0);
+}
+```
+
+### OAuth 2.0 — полный flow
+
+```java
+
+@Test
+@Order(8)
+@Story("Использование токена")
+@DisplayName("8. Полный OAuth flow: получить токен → использовать для запроса")
+@Description("Client Credentials → access_token → защищённый GET")
+void testFullOAuthFlow() {
+  // Шаг 1: получаем токен
+  String token = oAuthClient.fetchTokenClientCredentials(
+    TOKEN_URL, CLIENT_ID, CLIENT_SECRET, "read"
+  );
+  assertThat(token).isNotBlank();
+
+  // Шаг 2: используем токен для запроса к ресурсу
+  Response response = oAuthClient.sendGetWithBearerToken(
+    MOCK_BASE_URL + "/api/resource", 200, token,
+    new HashMap<>(), new HashMap<>(), new HashMap<>()
+  ).extract().response();
+
+  assertThat(response.jsonPath().getString("data")).isEqualTo("protected content");
+}
+```
+
+### API Key в заголовке
+
+```java
+
+@Test
+@Order(1)
+@Story("API Key в заголовке")
+@DisplayName("1. GET с API Key в заголовке X-API-Key")
+@Description("Проверяем, что X-API-Key передаётся в заголовке и виден в ответе")
+void testGetWithApiKeyHeader() {
+  Response response = apiKeyClient
+    .sendGetWithApiKeyHeader(
+      HTTPBIN_URL + "/get", 200,
+      "X-API-Key", FAKE_API_KEY,
+      new HashMap<>(), new HashMap<>(), new HashMap<>()
+    )
+    .extract().response();
+
+  // HTTPBin возвращает все заголовки в поле headers
+  String receivedKey = response.jsonPath().getString("headers.X-Api-Key");
+  assertThat(receivedKey).isEqualTo(FAKE_API_KEY);
 }
 ```
 
@@ -238,6 +296,18 @@ void testGetRequestWithActor() throws ExecutionException, InterruptedException {
 
 ## 🔧 API Клиенты
 
+### Иерархия клиентов
+
+```text
+ApiClient  (базовые HTTP операции: GET, POST, PUT, PATCH, DELETE)
+├── AuthApiClient  (Basic Auth + Bearer Token)
+│   └── OAuthApiClient  (OAuth 2.0: Client Credentials, Password, Refresh Token)
+├── ApiKeyClient  (API Keys: header / query-param / Stripe-style Basic Auth)
+├── FormApiClient  (application/x-www-form-urlencoded + cookies)
+├── MultipartApiClient  (multipart/form-data, загрузка файлов)
+└── SoapApiClient  (SOAP / text/xml)
+```
+
 ### ApiClient (базовый)
 
 Содержит методы для стандартных HTTP операций:
@@ -248,13 +318,34 @@ void testGetRequestWithActor() throws ExecutionException, InterruptedException {
 - `sendPatch()` - PATCH запросы
 - `sendDelete()` - DELETE запросы
 
-### AuthApiClient (с аутентификацией)
+### AuthApiClient (с аутентификацией + Bearer Token)
 
 Расширяет `ApiClient` и добавляет:
 
 - **Basic Auth**: `sendGetWithAuth()`, `sendPostWithAuth()`, etc.
 - **Bearer Token**: `sendGetWithBearerToken()`, `sendPostWithBearerToken()`, etc.
 - `sendPostForToken()` - получение токена
+
+### OAuthApiClient (OAuth 2.0)
+
+Расширяет `AuthApiClient` и добавляет поддержку трёх grant types:
+
+- `fetchTokenClientCredentials()` - Client Credentials grant
+- `fetchTokenPassword()` - Resource Owner Password grant
+- `refreshToken()` - Refresh Token grant
+- `sendGetWithOAuth()` - GET с автоматическим получением токена (удобный shortcut)
+
+> Тесты используют **WireMock** как встроенный OAuth-сервер — никакого Docker не нужно.
+
+### ApiKeyClient (API Keys)
+
+Расширяет `ApiClient` и поддерживает три способа передачи ключа:
+
+- **Через заголовок**: `sendGetWithApiKeyHeader()`, `sendPostWithApiKeyHeader()` — для `X-API-Key`, `Authorization` и
+  любых кастомных заголовков
+- **Через query-параметр**: `sendGetWithApiKeyQuery()` — для `api_key`, `key`, `token` и т.д.
+- **Stripe-style Basic Auth**: `sendGetWithApiKeyAsBasicAuth()` — ключ как username, пустой password (
+  `.auth().preemptive().basic()`)
 
 ### FormApiClient (для form-data)
 
@@ -307,6 +398,35 @@ void testGetRequestWithActor() throws ExecutionException, InterruptedException {
 - ✅ Полный цикл аутентификации
 - ✅ Негативный тест (401 без токена)
 
+### OAuthApiClientTest (11 тестов) — OAuth 2.0
+
+Тесты работают через встроенный **WireMock**-сервер (поднимается автоматически, не требует Docker):
+
+- ✅ Получение токена через Client Credentials grant
+- ✅ Десериализация ответа токена в модель `OAuthTokenResponse`
+- ✅ Проверка `expires_in` — токен не истёк сразу после получения
+- ✅ Получение токена через Resource Owner Password grant
+- ✅ Проверка наличия `refresh_token` в ответе Password grant
+- ✅ Обновление токена через Refresh Token grant
+- ✅ GET защищённого ресурса с валидным токеном
+- ✅ Полный OAuth flow: получить токен → использовать для запроса
+- ✅ Автоматический flow через `sendGetWithOAuth()`
+- ✅ Негативный тест (401 без токена)
+- ✅ Негативный тест (401 при неверном client_secret)
+
+### ApiKeyClientTest (10 тестов) — API Keys
+
+- ✅ GET с API Key в заголовке `X-API-Key`
+- ✅ GET с API Key в заголовке `Authorization` (кастомный формат `ApiKey ...`)
+- ✅ POST с телом + API Key в заголовке
+- ✅ Негативный тест (401 при пустом ключе)
+- ✅ GET с API Key в query-параметре `api_key`
+- ✅ API Key не вытесняет другие query-параметры
+- ✅ Разные имена параметра: `apikey`, `api_key`, `key`, `token`
+- ✅ Stripe-style: ключ кодируется в Base64 как Basic Auth username
+- ✅ Декодирование Base64 и проверка формата `apiKey:` (без пароля)
+- ✅ Сравнение header vs query: оба способа доставляют ключ на сервер
+
 ### FormApiClientTest (7 тестов) — form-data
 
 - ✅ POST с form parameters (с cookies и без)
@@ -349,9 +469,11 @@ void testGetRequestWithActor() throws ExecutionException, InterruptedException {
 Включает:
 
 - `ApiClientTest`
+- `ApiKeyClientTest`
 - `AuthApiClientTest`
 - `FormApiClientTest`
 - `MultipartApiClientTest`
+- `OAuthApiClientTest`
 - `XmlApiTest`
 - `SoapApiClientTest`
 
@@ -399,8 +521,8 @@ void testGetRequestWithActor() throws ExecutionException, InterruptedException {
     - ~~Тесты для SOAP сервисов~~ → `SoapApiClientTest`
 
 2. **Больше типов аутентификацией**
-    - OAuth 2.0 (полный flow)
-    - API Keys
+    - ~~OAuth 2.0 (полный flow)~~ → `OAuthApiClientTest` (WireMock)
+    - ~~API Keys~~ → `ApiKeyClientTest`
     - JWT токены (с проверкой expiration)
     - Digest Authentication
 
@@ -432,7 +554,7 @@ void testGetRequestWithActor() throws ExecutionException, InterruptedException {
     - OpenAPI/Swagger спецификации
 
 8. **Mock серверы**
-    - WireMock для мокирования API
+    - ~~WireMock для мокирования API~~ → используется в `OAuthApiClientTest`
     - MockServer интеграция
     - Тесты с локальным окружением
 
@@ -526,6 +648,7 @@ void testGetRequestWithActor() throws ExecutionException, InterruptedException {
 - [JUnit 5 User Guide](https://junit.org/junit5/docs/current/user-guide/)
 - [Allure Documentation](https://docs.qameta.io/allure/)
 - [Apache Pekko Documentation](https://pekko.apache.org/docs/pekko/current/)
+- [WireMock Documentation](https://wiremock.org/docs/)
 
 ### Обучающие материалы
 
