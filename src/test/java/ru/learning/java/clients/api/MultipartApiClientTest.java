@@ -3,6 +3,7 @@ package ru.learning.java.clients.api;
 import io.qameta.allure.Epic;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
+import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.MethodOrderer;
@@ -90,6 +91,7 @@ public class MultipartApiClientTest extends BaseApiTest {
     Files.writeString(tempFile.toPath(), "{\"key\":\"value\"}");
 
     Response response = given()
+      .contentType(ContentType.MULTIPART)
       .multiPart("file", tempFile, "application/json")
       .multiPart("category", "test-category")
       .post(HTTPBIN_URL + "/post")
