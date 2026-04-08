@@ -39,6 +39,10 @@
         <junit-platform-suite.version>1.14.3</junit-platform-suite.version>
         <!-- AssertJ -->
         <assertj.version>3.27.7</assertj.version>
+        <!-- JWT parsing (для валидации JWT токенов) -->
+        <java-jwt.version>4.4.0</java-jwt.version>
+        <!-- WireMock для мокирования OAuth сервера -->
+        <wiremock-standalone.version>3.10.0</wiremock-standalone.version>
 
         <!-- Plugin -->
         <!-- Maven Surefire -->
@@ -151,6 +155,22 @@
             <groupId>org.assertj</groupId>
             <artifactId>assertj-core</artifactId>
             <version>${assertj.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- JWT parsing (для валидации JWT токенов) -->
+        <dependency>
+            <groupId>com.auth0</groupId>
+            <artifactId>java-jwt</artifactId>
+            <version>${java-jwt.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- WireMock для мокирования OAuth сервера -->
+        <dependency>
+            <groupId>org.wiremock</groupId>
+            <artifactId>wiremock-standalone</artifactId>
+            <version>${wiremock-standalone.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>

@@ -5,9 +5,11 @@ import io.restassured.RestAssured;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import ru.learning.java.clients.api.ApiClient;
+import ru.learning.java.clients.api.ApiKeyClient;
 import ru.learning.java.clients.api.AuthApiClient;
 import ru.learning.java.clients.api.FormApiClient;
 import ru.learning.java.clients.api.MultipartApiClient;
+import ru.learning.java.clients.api.OAuthApiClient;
 import ru.learning.java.clients.api.SoapApiClient;
 
 public abstract class BaseApiTest {
@@ -17,6 +19,8 @@ public abstract class BaseApiTest {
   protected static FormApiClient formApiClient;
   protected static MultipartApiClient multipartApiClient;
   protected static SoapApiClient soapApiClient;
+  protected static OAuthApiClient oAuthClient;
+  protected static ApiKeyClient apiKeyClient;
   protected static ObjectMapper objectMapper;
 
   protected static final String BASE_URL = "https://jsonplaceholder.typicode.com";
@@ -32,6 +36,8 @@ public abstract class BaseApiTest {
     multipartApiClient = new MultipartApiClient();
     soapApiClient = new SoapApiClient();
     objectMapper = new ObjectMapper();
+    oAuthClient = new OAuthApiClient();
+    apiKeyClient = new ApiKeyClient();
   }
 
   @AfterEach
