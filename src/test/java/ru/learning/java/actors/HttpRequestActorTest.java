@@ -1,11 +1,19 @@
-package ru.learning.java.pekko;
+package ru.learning.java.actors;
 
-import io.qameta.allure.*;
+import io.qameta.allure.Description;
+import io.qameta.allure.Epic;
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
 import org.apache.pekko.actor.typed.ActorSystem;
 import org.apache.pekko.actor.typed.javadsl.AskPattern;
-import org.junit.jupiter.api.*;
-import ru.learning.java.actors.HttpRequestActor;
-import ru.learning.java.actors.HttpSupervisor;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
+import ru.learning.java.clients.api.base.BaseApiTest;
 
 import java.time.Duration;
 import java.util.ArrayList;
@@ -18,14 +26,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * Демонстрация работы с акторной моделью Pekko
  */
-@Epic("Pekko Actors Demo")
-@Feature("Actor Model Examples")
+@Epic("Pekko actors")
+@Feature("Actor Model")
 @DisplayName("Примеры использования акторной модели")
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public class PekkoActorsDemoTest {
+public class HttpRequestActorTest extends BaseApiTest {
 
   private static ActorSystem<HttpSupervisor.Command> actorSystem;
-  private static final String BASE_URL = "https://jsonplaceholder.typicode.com";
 
   @BeforeAll
   static void setUp() {

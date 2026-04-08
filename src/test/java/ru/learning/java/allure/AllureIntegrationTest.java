@@ -3,7 +3,7 @@ package ru.learning.java.allure;
 import io.qameta.allure.*;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.*;
-import ru.learning.java.clients.api.base.TestSpecification;
+import ru.learning.java.clients.api.base.SpecificationTest;
 import ru.learning.java.models.Comment;
 import ru.learning.java.models.CreateUserRequest;
 import ru.learning.java.models.Post;
@@ -25,7 +25,7 @@ import static org.hamcrest.Matchers.*;
 @Feature("TestSpecification Usage")
 @DisplayName("Тесты с Allure отчетами через TestSpecification")
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public class AllureIntegrationTest extends TestSpecification {
+public class AllureIntegrationTest extends SpecificationTest {
 
   private static final String BASE_URL = "https://jsonplaceholder.typicode.com";
 

@@ -7,7 +7,7 @@ import io.restassured.specification.RequestSpecification;
 /**
  * Спецификация для тестов с поддержкой Allure
  */
-public class TestSpecification extends Specification {
+public class SpecificationTest extends Specification {
 
   @Override
   public RequestSpecification requestSpecification() {

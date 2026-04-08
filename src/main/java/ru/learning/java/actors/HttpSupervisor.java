@@ -1,12 +1,12 @@
 package ru.learning.java.actors;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.pekko.actor.typed.ActorRef;
 import org.apache.pekko.actor.typed.Behavior;
 import org.apache.pekko.actor.typed.javadsl.AbstractBehavior;
 import org.apache.pekko.actor.typed.javadsl.ActorContext;
 import org.apache.pekko.actor.typed.javadsl.Behaviors;
 import org.apache.pekko.actor.typed.javadsl.Receive;
-import lombok.extern.slf4j.Slf4j;
 
 /**
  * Супервизор для управления HTTP акторами
@@ -15,11 +15,16 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class HttpSupervisor extends AbstractBehavior<HttpSupervisor.Command> {
 
-  public interface Command {}
+  public interface Command {
+  }
 
-  public record StartRequest(String requestId, String url, ActorRef<HttpRequestActor.Response> replyTo) implements Command {}
+  public record StartRequest(String requestId, String url,
+                             ActorRef<HttpRequestActor.Response> replyTo) implements Command {
+  }
 
-  public record StartPostRequest(String requestId, String url, String body, ActorRef<HttpRequestActor.Response> replyTo) implements Command {}
+  public record StartPostRequest(String requestId, String url, String body,
+                                 ActorRef<HttpRequestActor.Response> replyTo) implements Command {
+  }
 
   public static Behavior<Command> create() {
     return Behaviors.setup(HttpSupervisor::new);

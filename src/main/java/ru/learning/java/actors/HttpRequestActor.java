@@ -1,12 +1,12 @@
 package ru.learning.java.actors;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.pekko.actor.typed.ActorRef;
 import org.apache.pekko.actor.typed.Behavior;
 import org.apache.pekko.actor.typed.javadsl.AbstractBehavior;
 import org.apache.pekko.actor.typed.javadsl.ActorContext;
 import org.apache.pekko.actor.typed.javadsl.Behaviors;
 import org.apache.pekko.actor.typed.javadsl.Receive;
-import lombok.extern.slf4j.Slf4j;
 import ru.learning.java.clients.api.ApiClient;
 
 import java.util.HashMap;
@@ -20,13 +20,17 @@ public class HttpRequestActor extends AbstractBehavior<HttpRequestActor.Command>
   private final ApiClient apiClient;
 
   // Интерфейс команд
-  public interface Command {}
+  public interface Command {
+  }
 
-  public record ExecuteGetRequest(String url, ActorRef<Response> replyTo) implements Command {}
+  public record ExecuteGetRequest(String url, ActorRef<Response> replyTo) implements Command {
+  }
 
-  public record ExecutePostRequest(String url, String body, ActorRef<Response> replyTo) implements Command {}
+  public record ExecutePostRequest(String url, String body, ActorRef<Response> replyTo) implements Command {
+  }
 
-  public record Response(int statusCode, String body, boolean success) implements Command {}
+  public record Response(int statusCode, String body, boolean success) implements Command {
+  }
 
   public static Behavior<Command> create() {
     return Behaviors.setup(HttpRequestActor::new);
