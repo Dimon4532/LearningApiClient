@@ -34,7 +34,7 @@
         <!-- Allure REST Assured -->
         <allure.version>2.32.0</allure.version>
         <!-- JUnit 5 -->
-        <junit.version>5.11.4</junit.version>
+        <junit.version>5.14.3</junit.version>
         <!-- JUnit Platform Suite -->
         <junit-platform-suite.version>1.14.3</junit-platform-suite.version>
         <!-- AssertJ -->
