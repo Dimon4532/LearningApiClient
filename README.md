@@ -3,7 +3,7 @@
 [![Java](https://img.shields.io/badge/Java-21-orange.svg)](https://www.oracle.com/java/)
 [![REST Assured](https://img.shields.io/badge/REST%20Assured-5.5.7-green.svg)](https://rest-assured.io/)
 [![Apache Pekko](https://img.shields.io/badge/Apache%20Pekko-1.1.3-blue.svg)](https://pekko.apache.org/)
-[![JUnit 5](https://img.shields.io/badge/JUnit-5.11.4-red.svg)](https://junit.org/junit5/)
+[![JUnit 5](https://img.shields.io/badge/JUnit-5.14.3-red.svg)](https://junit.org/junit5/)
 [![Allure](https://img.shields.io/badge/Allure-2.32.0-yellow.svg)](https://docs.qameta.io/allure/)
 
 Комплексный учебный проект для изучения тестирования REST API с использованием современного стека технологий Java.
@@ -50,14 +50,14 @@
 | **WireMock**     | 3.10.0  | Mock-сервер для изолированного тестирования |
 | **java-jwt**     | 4.4.0   | Работа с JWT токенами                       |
 | **Logback**      | 1.5.32  | Логирование                                 |
-| **Maven**        | -       | Система сборки                              |
+| **Maven**        | 3.8     | Система сборки                              |
 
 ## 🚀 Быстрый старт
 
 ### Предварительные требования
 
 - **Java 21** или выше
-- **Maven 3.6+**
+- **Maven 3.8+**
 - **IDE** (IntelliJ IDEA рекомендуется)
 
 ### Установка
@@ -467,7 +467,6 @@ ApiClient  (базовые HTTP операции: GET, POST, PUT, PATCH, DELETE)
 указывать каждый класс вручную.
 
 Включает:
-
 - `ApiClientTest`
 - `ApiKeyClientTest`
 - `AuthApiClientTest`
@@ -622,7 +621,7 @@ void testGetRequestWithActor() throws ExecutionException, InterruptedException {
 18. **Документация**
 
 - API документация с Swagger
-- JavaDoc для всех публичных методов
+- Javadoc для всех публичных методов
 - Confluence/Wiki страницы
 - Video tutorials
 
@@ -658,7 +657,7 @@ void testGetRequestWithActor() throws ExecutionException, InterruptedException {
 
 ### Практика
 
-- [JSONPlaceholder](https://jsonplaceholder.typicode.com/) - Free fake API
+- [JSONPlaceholder](https://jsonplaceholder.typicode.com/) – Free fake API
 - [HTTPBin](https://httpbin.org/) - HTTP testing service
 - [ReqRes](https://reqres.in/) - Test API
 
