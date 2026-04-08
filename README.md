@@ -82,136 +82,166 @@
    ```
 
 ## 📁 Структура проекта
-```
+
+```text
 src/
 ├── main/
 │   ├── java/ru/learning/java/
-│   │   ├── actors/                          # Акторная модель (Apache Pekko)
-│   │   │   ├── HttpRequestActor.java        # Актор: выполняет HTTP запрос и возвращает ответ
-│   │   │   └── HttpSupervisor.java          # Супервизор: управляет запуском акторов
-│   │   ├── clients/api/                     # API клиенты (паттерн API Client)
+│   │   ├── actors/
+│   │   │   ├── HttpRequestActor.java
+│   │   │   └── HttpSupervisor.java
+│   │   ├── clients/api/
 │   │   │   ├── base/
-│   │   │   │   └── Specification.java       # Базовые Request/Response спецификации REST Assured
-│   │   │   ├── ApiClient.java               # Базовый клиент: GET, POST, PUT, PATCH, DELETE
-│   │   │   ├── AuthApiClient.java           # Клиент с аутентификацией: Basic Auth + Bearer Token
-│   │   │   ├── FormApiClient.java           # Клиент для form-data (application/x-www-form-urlencoded)
-│   │   │   ├── MultipartApiClient.java      # Клиент для загрузки файлов (multipart/form-data)
-│   │   │   └── SoapApiClient.java           # Клиент для SOAP запросов (text/xml)
-│   │   ├── config/                          # Конфигурация приложения
-│   │   │   ├── AppConfig.java               # Синглтон: читает параметры из application.conf
-│   │   │   └── PropsConfig.java             # Точка доступа к конфигурации
-│   │   └── models/                          # Модели данных (Java Records + Lombok)
-│   │       ├── Comment.java                 # Модель комментария (Record)
-│   │       ├── CreateUserRequest.java       # Модель запроса создания пользователя (Lombok Builder)
-│   │       ├── Post.java                    # Модель поста (Record)
-│   │       ├── User.java                    # Модель пользователя (Record)
-│   │       └── UserXml.java                 # Модель пользователя для XML/JAXB сериализации
+│   │   │   │   └── Specification.java
+│   │   │   ├── ApiClient.java
+│   │   │   ├── AuthApiClient.java
+│   │   │   ├── FormApiClient.java
+│   │   │   ├── MultipartApiClient.java
+│   │   │   └── SoapApiClient.java
+│   │   ├── config/
+│   │   │   ├── AppConfig.java
+│   │   │   └── PropsConfig.java
+│   │   └── models/
+│   │       ├── Comment.java
+│   │       ├── CreateUserRequest.java
+│   │       ├── Post.java
+│   │       ├── User.java
+│   │       └── UserXml.java
 │   └── resources/
-│       └── application.conf                 # Конфигурация: URL, SSL, параметры подключения
+│       └── application.conf
 └── test/
     ├── java/ru/learning/java/
+    │   ├── actors/
+    │   │   └── HttpRequestActorTest.java
     │   ├── allure/
-    │   │   └── AllureIntegrationTest.java   # Демонстрация возможностей Allure (шаги, вложения)
-    │   ├── clients/api/                     # Тесты API клиентов
+    │   │   └── AllureIntegrationTest.java
+    │   ├── clients/api/
     │   │   ├── base/
-    │   │   │   ├── BaseApiTest.java         # Базовый класс тестов: инициализация клиентов и констант
-    │   │   │   └── TestSpecification.java   # Вспомогательные спецификации для тестов
-    │   │   ├── ApiClientTest.java           # Тесты базовых HTTP операций (22 теста)
-    │   │   ├── AuthApiClientTest.java       # Тесты Basic Auth и Bearer Token (14 тестов)
-    │   │   ├── FormApiClientTest.java       # Тесты form-data запросов (7 тестов)
-    │   │   ├── MultipartApiClientTest.java  # Тесты загрузки файлов (4 теста)
-    │   │   ├── SoapApiClientTest.java       # Тесты SOAP сервисов (2 теста)
-    │   │   └── XmlApiTest.java              # Тесты работы с XML и JAXB (4 теста)
-    │   └── pekko/
-    │       └── PekkoActorsDemoTest.java     # Тесты асинхронных запросов через акторы
+    │   │   │   ├── BaseApiTest.java
+    │   │   │   └── SpecificationTest.java
+    │   │   ├── ApiClientTest.java
+    │   │   ├── AuthApiClientTest.java
+    │   │   ├── FormApiClientTest.java
+    │   │   ├── MultipartApiClientTest.java
+    │   │   ├── SoapApiClientTest.java
+    │   │   └── XmlApiTest.java
+    │   └── suites/
+    │       └── ApiTestSuite.java
     └── resources/
         └── test-data/
-            └── sample.txt                   # Файл для тестов загрузки (MultipartApiClientTest)
+            └── sample.txt
 ```
+
+### Описание ключевых пакетов
+
+| Путь                            | Описание                                                            |
+|---------------------------------|---------------------------------------------------------------------|
+| `main/.../actors/`              | Акторная модель (Apache Pekko): актор HTTP-запроса и супервизор     |
+| `main/.../clients/api/`         | API клиенты: базовый, с аутентификацией, form-data, multipart, SOAP |
+| `main/.../clients/api/base/`    | Базовые Request/Response спецификации REST Assured                  |
+| `main/.../config/`              | Конфигурация приложения (читает `application.conf`)                 |
+| `main/.../models/`              | Модели данных: Java Records + Lombok Builder                        |
+| `test/.../actors/`              | Тесты акторной модели (4 теста, Apache Pekko)                       |
+| `test/.../allure/`              | Демонстрация возможностей Allure: шаги, вложения, аннотации         |
+| `test/.../clients/api/`         | Тесты всех API клиентов (53+ теста)                                 |
+| `test/.../clients/api/base/`    | Базовый класс тестов и вспомогательные спецификации                 |
+| `test/.../suites/`              | JUnit Suite для запуска всех API тестов одной командой              |
+| `test/.../resources/test-data/` | Тестовые файлы для multipart-загрузки                               |
 
 ## 💡 Примеры использования
 
 ### Простой GET запрос
 
 ```java 
+
 @Test
 @Order(1)
 @Story("GET запросы")
 @DisplayName("1. Простой GET запрос - получение списка пользователей")
 @Description("Демонстрация базового GET запроса и валидации статус кода")
 void testSimpleGetRequest() {
-   Response response = apiClient
-           .sendGet(BASE_URL + "/users", new HashMap<>(), new HashMap<>(), new HashMap<>(), new HashMap<>())
-           .extract().response();
+  Response response = apiClient
+    .sendGet(BASE_URL + "/users", new HashMap<>(), new HashMap<>(), new HashMap<>(), new HashMap<>())
+    .extract().response();
 
-   assertThat(response.statusCode()).isEqualTo(200);
-   assertThat(response.jsonPath().getList("$")).isNotEmpty();
+  assertThat(response.statusCode()).isEqualTo(200);
+  assertThat(response.jsonPath().getList("$")).isNotEmpty();
 }
 ```
 
-### POST запрос с JSON 
+### POST запрос с JSON
+
 ```java 
+
 @Test
 @Order(7)
 @Story("POST запросы")
 @DisplayName("7. POST запрос с объектом")
 @Description("Создание поста из Java объекта")
 void testPostRequestWithObject() throws JsonProcessingException {
-   Post newPost = new Post(1L, null, "My Test Post", "Content of my test post");
+  Post newPost = new Post(1L, null, "My Test Post", "Content of my test post");
 
-   Response response = apiClient
-           .sendPost(BASE_URL + "/posts", 201, objectMapper.writeValueAsString(newPost),
-                   new HashMap<>(), new HashMap<>(), new HashMap<>())
-           .extract().response();
+  Response response = apiClient
+    .sendPost(
+      BASE_URL + "/posts", 201, objectMapper.writeValueAsString(newPost),
+      new HashMap<>(), new HashMap<>(), new HashMap<>()
+    )
+    .extract().response();
 
-   assertThat(response.jsonPath().getInt("id")).isGreaterThan(0);
+  assertThat(response.jsonPath().getInt("id")).isGreaterThan(0);
 }
 ```
 
 ### Загрузка файла (Multipart)
+
 ```java 
+
 @Test
 @Story("Multipart")
 @DisplayName("1. Загрузка текстового файла")
 void testUploadTextFile() throws IOException {
-    File tempFile = File.createTempFile("test-upload", ".txt");
-    tempFile.deleteOnExit();
-    Files.writeString(tempFile.toPath(), "Hello from REST Assured!");
+  File tempFile = File.createTempFile("test-upload", ".txt");
+  tempFile.deleteOnExit();
+  Files.writeString(tempFile.toPath(), "Hello from REST Assured!");
 
-    Response response = multipartApiClient
-            .uploadFile(HTTPBIN_URL + "/post", 200, tempFile, "file", new HashMap<>())
-            .extract().response();
+  Response response = multipartApiClient
+    .uploadFile(HTTPBIN_URL + "/post", 200, tempFile, "file", new HashMap<>())
+    .extract().response();
 
-    assertThat(response.jsonPath().getString("files.file")).isEqualTo("Hello from REST Assured!");
+  assertThat(response.jsonPath().getString("files.file")).isEqualTo("Hello from REST Assured!");
 }
 ```
 
 ### GET запрос через актор (Apache Pekko)
+
 ```java
+
 @Test
 @Story("Акторы")
 @DisplayName("1. Выполнение GET запроса через актор")
 @Description("Демонстрация асинхронного выполнения GET запроса")
 void testGetRequestWithActor() throws ExecutionException, InterruptedException {
-   CompletionStage<HttpRequestActor.Response> result = AskPattern.ask(
-           actorSystem,
-           replyTo -> new HttpSupervisor.StartRequest("req-1", BASE_URL + "/users/1", replyTo),
-           Duration.ofSeconds(10),
-           actorSystem.scheduler()
-   );
+  CompletionStage<HttpRequestActor.Response> result = AskPattern.ask(
+    actorSystem,
+    replyTo -> new HttpSupervisor.StartRequest("req-1", BASE_URL + "/users/1", replyTo),
+    Duration.ofSeconds(10),
+    actorSystem.scheduler()
+  );
 
-   HttpRequestActor.Response response = result.toCompletableFuture().get();
+  HttpRequestActor.Response response = result.toCompletableFuture().get();
 
-   assertThat(response.success()).isTrue();
-   assertThat(response.statusCode()).isEqualTo(200);
-   assertThat(response.body()).contains("\"id\": 1");
+  assertThat(response.success()).isTrue();
+  assertThat(response.statusCode()).isEqualTo(200);
+  assertThat(response.body()).contains("\"id\": 1");
 }
 ```
 
 ## 🔧 API Клиенты
 
 ### ApiClient (базовый)
+
 Содержит методы для стандартных HTTP операций:
+
 - `sendGet()` - GET запросы
 - `sendPost()` - POST запросы
 - `sendPut()` - PUT запросы
@@ -219,31 +249,41 @@ void testGetRequestWithActor() throws ExecutionException, InterruptedException {
 - `sendDelete()` - DELETE запросы
 
 ### AuthApiClient (с аутентификацией)
+
 Расширяет `ApiClient` и добавляет:
+
 - **Basic Auth**: `sendGetWithAuth()`, `sendPostWithAuth()`, etc.
 - **Bearer Token**: `sendGetWithBearerToken()`, `sendPostWithBearerToken()`, etc.
 - `sendPostForToken()` - получение токена
 
 ### FormApiClient (для form-data)
+
 Работа с `application/x-www-form-urlencoded`:
+
 - `sendGetWithFormParams()` - GET с form параметрами и cookies
 - `sendPostWithFormParams()` - POST с form параметрами (с cookies и без)
 - `sendPutWithFormParams()` - PUT с form параметрами
 - `sendPatchWithFormParams()` - PATCH с form параметрами
 
 ### MultipartApiClient (для загрузки файлов)
+
 Работа с multipart/form-data:
+
 - `uploadFile()` - загрузка файла
 - `uploadFileWithFormData()` - загрузка файла с дополнительными полями формы
 
 ### SoapApiClient (для SOAP сервисов)
+
 Работа с SOAP-запросами:
+
 - `sendSoapRequest()` - отправка SOAP-запроса с text/xml
 
 ## 🧪 Тестовые сценарии
+
 Тесты организованы по принципу «один клиент = один тестовый класс» и наследуются от общего BaseApiTest.
 
 ### ApiClientTest (22 теста) — базовые HTTP операции
+
 - ✅ GET запросы (простые, с path params, с query params)
 - ✅ POST запросы (JSON строка, Java объект)
 - ✅ PUT запросы (полное обновление)
@@ -259,6 +299,7 @@ void testGetRequestWithActor() throws ExecutionException, InterruptedException {
 - ✅ Демонстрация наследования клиентов (AuthApiClient, FormApiClient)
 
 ### AuthApiClientTest (14 тестов) — аутентификация
+
 - ✅ GET/POST/PUT/PATCH/DELETE с Basic Auth
 - ✅ Негативный тест (401 без credentials)
 - ✅ Получение Bearer токена
@@ -267,63 +308,84 @@ void testGetRequestWithActor() throws ExecutionException, InterruptedException {
 - ✅ Негативный тест (401 без токена)
 
 ### FormApiClientTest (7 тестов) — form-data
+
 - ✅ POST с form parameters (с cookies и без)
 - ✅ GET с form parameters
 - ✅ PUT с form parameters (простой и с session cookie)
 - ✅ PATCH с form parameters
 
 ### MultipartApiClientTest (4 теста) — загрузка файлов
+
 - ✅ Загрузка временного файла с проверкой содержимого
 - ✅ Загрузка файла из classpath
 - ✅ Загрузка файла с дополнительными полями формы
 - ✅ Inline multipart без клиента
 
 ### XmlApiTest (4 теста) — работа с XML
+
 - ✅ Парсинг XML-ответа через xmlPath()
 - ✅ Валидация XML через Hamcrest hasXPath()
 - ✅ POST запрос с XML-телом
 - ✅ POST с JAXB-объектом (автоматическая сериализация)
 
 ### SoapApiClientTest (2 теста) — SOAP сервисы
+
 - ✅ Вызов SOAP-метода NumberToWords и парсинг ответа
 - ✅ Валидация SOAP-ответа через XPath
 
 ### AllureIntegrationTest — демонстрация Allure
+
 - ✅ Примеры использования аннотаций и вложений Allure
 
-### PekkoActorsDemoTest — акторная модель
+### HttpRequestActorTest — акторная модель
+
 - ✅ Асинхронные HTTP запросы через Apache Pekko акторы
+
+### 🗂 ApiTestSuite — сводный запуск всех API тестов
+
+`ApiTestSuite` — JUnit Platform Suite, позволяющий запустить **все API тесты одной командой** без необходимости
+указывать каждый класс вручную.
+
+Включает:
+
+- `ApiClientTest`
+- `AuthApiClientTest`
+- `FormApiClientTest`
+- `MultipartApiClientTest`
+- `XmlApiTest`
+- `SoapApiClientTest`
 
 ## 📊 Allure отчеты
 
 Проект использует Allure для создания детальных отчетов
 
 **Запуск отчета:**
-   bash mvn allure:serve
+bash mvn allure:serve
 
 ## 🎭 Акторная модель
 
 Демонстрация асинхронных запросов с Apache Pekko:
 
 ```java 
+
 @Test
 @Order(1)
 @Story("Акторы")
 @DisplayName("1. Выполнение GET запроса через актор")
 @Description("Демонстрация асинхронного выполнения GET запроса")
 void testGetRequestWithActor() throws ExecutionException, InterruptedException {
-   CompletionStage<HttpRequestActor.Response> result = AskPattern.ask(
-           actorSystem,
-           replyTo -> new HttpSupervisor.StartRequest("req-1", BASE_URL + "/users/1", replyTo),
-           Duration.ofSeconds(10),
-           actorSystem.scheduler()
-   );
+  CompletionStage<HttpRequestActor.Response> result = AskPattern.ask(
+    actorSystem,
+    replyTo -> new HttpSupervisor.StartRequest("req-1", BASE_URL + "/users/1", replyTo),
+    Duration.ofSeconds(10),
+    actorSystem.scheduler()
+  );
 
-   HttpRequestActor.Response response = result.toCompletableFuture().get();
+  HttpRequestActor.Response response = result.toCompletableFuture().get();
 
-   assertThat(response.success()).isTrue();
-   assertThat(response.statusCode()).isEqualTo(200);
-   assertThat(response.body()).contains("\"id\": 1");
+  assertThat(response.success()).isTrue();
+  assertThat(response.statusCode()).isEqualTo(200);
+  assertThat(response.body()).contains("\"id\": 1");
 }
 ```
 
@@ -332,133 +394,147 @@ void testGetRequestWithActor() throws ExecutionException, InterruptedException {
 ### 🎓 Уровень 1: Базовые улучшения
 
 1. **Расширение покрытия API**
-   - ~~Добавить тесты для файловой загрузки (multipart/form-data)~~ → `MultipartApiClientTest`
-   - ~~Работа с XML (кроме JSON)~~ → `XmlApiTest`
-   - ~~Тесты для SOAP сервисов~~ → `SoapApiClientTest`
+    - ~~Добавить тесты для файловой загрузки (multipart/form-data)~~ → `MultipartApiClientTest`
+    - ~~Работа с XML (кроме JSON)~~ → `XmlApiTest`
+    - ~~Тесты для SOAP сервисов~~ → `SoapApiClientTest`
 
 2. **Больше типов аутентификацией**
-   - OAuth 2.0 (полный flow)
-   - API Keys
-   - JWT токены (с проверкой expiration)
-   - Digest Authentication
+    - OAuth 2.0 (полный flow)
+    - API Keys
+    - JWT токены (с проверкой expiration)
+    - Digest Authentication
 
 3. **Улучшение моделей данных**
-   - Добавить валидацию через Bean Validation (JSR-303)
-   - Создать builders для всех моделей
-   - Добавить примеры использования Immutables
+    - Добавить валидацию через Bean Validation (JSR-303)
+    - Создать builders для всех моделей
+    - Добавить примеры использования Immutables
 
 4. **Data-Driven тестирование**
-   - Параметризованные тесты с `@ParameterizedTest`
-   - Чтение тестовых данных из CSV/JSON файлов
-   - Использование TestNG DataProvider
+    - Параметризованные тесты с `@ParameterizedTest`
+    - Чтение тестовых данных из CSV/JSON файлов
+    - Использование TestNG DataProvider
 
 ### 🚀 Уровень 2: Продвинутые техники
 
 5. **CI/CD Integration**
-   - GitHub Actions / GitLab CI конфигурация
-   - Docker контейнеры для тестов
-   - Автоматическая публикация Allure отчетов
+    - GitHub Actions / GitLab CI конфигурация
+    - Docker контейнеры для тестов
+    - Автоматическая публикация Allure отчетов
 
 6. **Performance Testing**
-   - Интеграция с Gatling
-   - Load testing с JMeter
-   - Метрики производительности в отчетах
+    - Интеграция с Gatling
+    - Load testing с JMeter
+    - Метрики производительности в отчетах
 
 7. **Contract Testing**
-   - Spring Cloud Contract
-   - Pact для consumer-driven contracts
-   - OpenAPI/Swagger спецификации
+    - Spring Cloud Contract
+    - Pact для consumer-driven contracts
+    - OpenAPI/Swagger спецификации
 
 8. **Mock серверы**
-   - WireMock для мокирования API
-   - MockServer интеграция
-   - Тесты с локальным окружением
+    - WireMock для мокирования API
+    - MockServer интеграция
+    - Тесты с локальным окружением
 
 9. **Улучшение архитектуры**
-   - Dependency Injection (Spring/Guice)
-   - Retry механизмы (Resilience4j)
-   - Circuit Breaker паттерн
-   - Rate limiting
+    - Dependency Injection (Spring/Guice)
+    - Retry механизмы (Resilience4j)
+    - Circuit Breaker паттерн
+    - Rate limiting
 
 ### 🎯 Уровень 3: Enterprise решения
 
 10. **Database Testing**
-   - Интеграция с TestContainers
-   - Проверка данных в БД после API вызовов
-   - Flyway/Liquibase для миграций
+
+- Интеграция с TestContainers
+- Проверка данных в БД после API вызовов
+- Flyway/Liquibase для миграций
 
 11. **Security Testing**
-   - OWASP ZAP интеграция
-   - Security headers валидация
-   - SQL injection тесты
-   - XSS проверки
+
+- OWASP ZAP интеграция
+- Security headers валидация
+- SQL injection тесты
+- XSS проверки
 
 12. **Monitoring & Observability**
-   - Prometheus metrics
-   - ELK Stack для логов
-   - Distributed tracing (Jaeger/Zipkin)
+
+- Prometheus metrics
+- ELK Stack для логов
+- Distributed tracing (Jaeger/Zipkin)
 
 13. **Advanced Reporting**
-   - Кастомные Allure plugins
-   - Интеграция с Jira/TestRail
-   - Slack/Email уведомления
-   - Тренды качества (historical reports)
+
+- Кастомные Allure plugins
+- Интеграция с Jira/TestRail
+- Slack/Email уведомления
+- Тренды качества (historical reports)
 
 14. **GraphQL Testing**
-   - GraphQL запросы и мутации
-   - Schema validation
-   - Subscription тесты
+
+- GraphQL запросы и мутации
+- Schema validation
+- Subscription тесты
 
 15. **WebSocket Testing**
-   - Real-time communication тесты
-   - Socket.IO интеграция
+
+- Real-time communication тесты
+- Socket.IO интеграция
 
 ### 💼 Практические задания
 
 16. **Создать тесты для реального API**
-   - GitHub API
-   - Swagger Petstore
-   - Rick and Morty API
-   - Pokemon API
+
+- GitHub API
+- Swagger Petstore
+- Rick and Morty API
+- Pokemon API
 
 17. **Реализовать паттерны**
-   - Builder для сложных запросов
-   - Chain of Responsibility для middleware
-   - Strategy для различных auth механизмов
-   - Factory для создания клиентов
+
+- Builder для сложных запросов
+- Chain of Responsibility для middleware
+- Strategy для различных auth механизмов
+- Factory для создания клиентов
 
 18. **Документация**
-   - API документация с Swagger
-   - JavaDoc для всех публичных методов
-   - Confluence/Wiki страницы
-   - Video tutorials
+
+- API документация с Swagger
+- JavaDoc для всех публичных методов
+- Confluence/Wiki страницы
+- Video tutorials
 
 ### 🎨 Дополнительные идеи
 
 19. **Кросс-платформенное тестирование**
-   - Сравнение REST vs GraphQL vs gRPC
-   - Миграция с RestAssured на другие библиотеки
-   - Polyglot тесты (Java + Python + JavaScript)
+
+- Сравнение REST vs GraphQL vs gRPC
+- Миграция с RestAssured на другие библиотеки
+- Polyglot тесты (Java + Python + JavaScript)
 
 20. **AI/ML интеграция**
-   - Автоматическая генерация тестов из Swagger
-   - Анализ логов с помощью ML
-   - Предсказание потенциальных багов
+
+- Автоматическая генерация тестов из Swagger
+- Анализ логов с помощью ML
+- Предсказание потенциальных багов
 
 ## 📚 Полезные ресурсы
 
 ### Официальная документация
+
 - [REST Assured Guide](https://rest-assured.io/)
 - [JUnit 5 User Guide](https://junit.org/junit5/docs/current/user-guide/)
 - [Allure Documentation](https://docs.qameta.io/allure/)
 - [Apache Pekko Documentation](https://pekko.apache.org/docs/pekko/current/)
 
 ### Обучающие материалы
+
 - [REST API Testing with REST Assured](https://testautomationu.applitools.com/automating-your-api-tests-with-rest-assured/)
 - [Java Testing with JUnit 5](https://www.baeldung.com/junit-5)
 - [Allure Report Tutorial](https://www.youtube.com/watch?v=gUPzhDR2f1E)
 
 ### Практика
+
 - [JSONPlaceholder](https://jsonplaceholder.typicode.com/) - Free fake API
 - [HTTPBin](https://httpbin.org/) - HTTP testing service
 - [ReqRes](https://reqres.in/) - Test API

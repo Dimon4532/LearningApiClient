@@ -31,7 +31,6 @@ public class AllureIntegrationTest extends SpecificationTest {
 
   @BeforeEach
   void setUpSpec() {
-    // Устанавливаем спецификацию с Allure фильтром
     installSpecification(requestSpecification(), responseSpecification());
   }
 
