@@ -21,18 +21,18 @@ public class FormApiClient extends ApiClient {
    * @param cookies    cookies
    * @param formParams параметры формы
    */
-  public ValidatableResponse sendGetWithFormParams(String url,
-                                                   Map<String, String> headers,
+  public ValidatableResponse sendGetWithFormParams(String url, Map<String, String> headers,
                                                    Map<String, String> cookies,
                                                    Map<String, String> formParams) {
-    installSpecification(requestSpecification(), responseSpecification());
     return given()
+      .spec(requestSpecification())
       .cookies(cookies)
       .headers(headers)
       .formParams(formParams)
       .when()
       .get(url)
       .then()
+      .spec(responseSpecification())
       .log().all();
   }
 
@@ -43,17 +43,17 @@ public class FormApiClient extends ApiClient {
    * @param headers    заголовки
    * @param formParams параметры формы
    */
-  public ValidatableResponse sendPostWithFormParams(String url,
-                                                    Map<String, String> headers,
+  public ValidatableResponse sendPostWithFormParams(String url, Map<String, String> headers,
                                                     Map<String, String> formParams) {
-    installSpecification(requestSpecification(), responseSpecification());
     return given()
+      .spec(requestSpecification())
       .contentType(ContentType.URLENC)
       .headers(headers)
       .formParams(formParams)
       .when()
       .post(url)
       .then()
+      .spec(responseSpecification())
       .log().all();
   }
 
@@ -65,12 +65,11 @@ public class FormApiClient extends ApiClient {
    * @param cookies    cookies
    * @param formParams параметры формы
    */
-  public ValidatableResponse sendPostWithFormParams(String url,
-                                                    Map<String, String> headers,
+  public ValidatableResponse sendPostWithFormParams(String url, Map<String, String> headers,
                                                     Map<String, String> cookies,
                                                     Map<String, String> formParams) {
-    installSpecification(requestSpecification(), responseSpecification());
     return given()
+      .spec(requestSpecification())
       .contentType(ContentType.URLENC)
       .redirects().follow(false)
       .cookies(cookies)
@@ -79,6 +78,7 @@ public class FormApiClient extends ApiClient {
       .when()
       .post(url)
       .then()
+      .spec(responseSpecification())
       .log().all();
   }
 
@@ -90,12 +90,11 @@ public class FormApiClient extends ApiClient {
    * @param cookies    cookies
    * @param formParams параметры формы
    */
-  public ValidatableResponse sendPutWithFormParams(String url,
-                                                   Map<String, String> headers,
+  public ValidatableResponse sendPutWithFormParams(String url, Map<String, String> headers,
                                                    Map<String, String> cookies,
                                                    Map<String, String> formParams) {
-    installSpecification(requestSpecification(), responseSpecification());
     return given()
+      .spec(requestSpecification())
       .contentType(ContentType.URLENC)
       .cookies(cookies)
       .headers(headers)
@@ -103,6 +102,7 @@ public class FormApiClient extends ApiClient {
       .when()
       .put(url)
       .then()
+      .spec(responseSpecification())
       .log().all();
   }
 
@@ -114,12 +114,11 @@ public class FormApiClient extends ApiClient {
    * @param cookies    cookies
    * @param formParams параметры формы
    */
-  public ValidatableResponse sendPatchWithFormParams(String url,
-                                                     Map<String, String> headers,
+  public ValidatableResponse sendPatchWithFormParams(String url, Map<String, String> headers,
                                                      Map<String, String> cookies,
                                                      Map<String, String> formParams) {
-    installSpecification(requestSpecification(), responseSpecification());
     return given()
+      .spec(requestSpecification())
       .contentType(ContentType.URLENC)
       .cookies(cookies)
       .headers(headers)
@@ -127,6 +126,7 @@ public class FormApiClient extends ApiClient {
       .when()
       .patch(url)
       .then()
+      .spec(responseSpecification())
       .log().all();
   }
 }

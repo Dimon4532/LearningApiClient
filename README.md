@@ -3,7 +3,7 @@
 [![Java](https://img.shields.io/badge/Java-21-orange.svg)](https://www.oracle.com/java/)
 [![REST Assured](https://img.shields.io/badge/REST%20Assured-5.5.7-green.svg)](https://rest-assured.io/)
 [![Apache Pekko](https://img.shields.io/badge/Apache%20Pekko-1.1.3-blue.svg)](https://pekko.apache.org/)
-[![JUnit 5](https://img.shields.io/badge/JUnit-5.14.3-red.svg)](https://junit.org/junit5/)
+[![JUnit 5](https://img.shields.io/badge/JUnit-5.11.4-red.svg)](https://junit.org/junit5/)
 [![Allure](https://img.shields.io/badge/Allure-2.32.0-yellow.svg)](https://docs.qameta.io/allure/)
 
 Комплексный учебный проект для изучения тестирования REST API с использованием современного стека технологий Java.
@@ -65,7 +65,7 @@
 1. **Клонируйте репозиторий:**
    ```bash
    git clone <your-repo-url>
-   cd test-project-3
+   cd leaning-api-clients
    ```
 2. **Соберите проект:**
    ```bash
@@ -471,10 +471,11 @@ ApiClient  (базовые HTTP операции: GET, POST, PUT, PATCH, DELETE)
 - `ApiKeyClientTest`
 - `AuthApiClientTest`
 - `FormApiClientTest`
+- `JwtApiClientTest`
 - `MultipartApiClientTest`
 - `OAuthApiClientTest`
-- `XmlApiTest`
 - `SoapApiClientTest`
+- `XmlApiTest`
 
 ## 📊 Allure отчеты
 

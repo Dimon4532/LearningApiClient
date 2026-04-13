@@ -8,40 +8,41 @@ import ru.learning.java.clients.api.ApiClient;
 import ru.learning.java.clients.api.ApiKeyClient;
 import ru.learning.java.clients.api.AuthApiClient;
 import ru.learning.java.clients.api.FormApiClient;
+import ru.learning.java.clients.api.JwtApiClient;
 import ru.learning.java.clients.api.MultipartApiClient;
 import ru.learning.java.clients.api.OAuthApiClient;
 import ru.learning.java.clients.api.SoapApiClient;
 
+import static ru.learning.java.config.PropsConfigTest.getProps;
+
 public abstract class BaseApiTest {
 
   protected static ApiClient apiClient;
+  protected static ApiKeyClient apiKeyClient;
   protected static AuthApiClient authApiClient;
   protected static FormApiClient formApiClient;
+  protected static JwtApiClient jwtClient;
   protected static MultipartApiClient multipartApiClient;
-  protected static SoapApiClient soapApiClient;
   protected static OAuthApiClient oAuthClient;
-  protected static ApiKeyClient apiKeyClient;
+  protected static SoapApiClient soapApiClient;
+
   protected static ObjectMapper objectMapper;
 
-  protected static final String BASE_URL = "https://jsonplaceholder.typicode.com";
-  protected static final String HTTPBIN_URL = "https://httpbin.org";
-  protected static final String SOAP_URL =
-    "https://www.dataaccess.com/webservicesserver/NumberConversion.wso";
+  protected static final String BASE_URL = getProps().getBaseUrl();
+  protected static final String HTTPBIN_URL = getProps().getHttpBinUrl();
+  protected static final String SOAP_URL = getProps().getSoapUrl();
 
   @BeforeAll
   static void setUpBase() {
     apiClient = new ApiClient();
+    apiKeyClient = new ApiKeyClient();
     authApiClient = new AuthApiClient();
     formApiClient = new FormApiClient();
+    jwtClient = new JwtApiClient();
     multipartApiClient = new MultipartApiClient();
-    soapApiClient = new SoapApiClient();
-    objectMapper = new ObjectMapper();
     oAuthClient = new OAuthApiClient();
-    apiKeyClient = new ApiKeyClient();
-  }
+    soapApiClient = new SoapApiClient();
 
-  @AfterEach
-  void resetSpecifications() {
-    RestAssured.reset();
+    objectMapper = new ObjectMapper();
   }
 }

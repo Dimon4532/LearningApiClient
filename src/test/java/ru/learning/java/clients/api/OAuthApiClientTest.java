@@ -32,6 +32,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @Feature("OAuth 2.0 Authentication")
+@DisplayName("Тесты OAuthApiClientTest - аутентификация через OAuth 2.0")
 public class OAuthApiClientTest extends BaseApiTest {
   private static WireMockServer wireMock;
   private static String TOKEN_URL;

@@ -29,11 +29,6 @@ public class AllureIntegrationTest extends SpecificationTest {
 
   private static final String BASE_URL = "https://jsonplaceholder.typicode.com";
 
-  @BeforeEach
-  void setUpSpec() {
-    installSpecification(requestSpecification(), responseSpecification());
-  }
-
   @Test
   @Order(1)
   @Story("Allure отчеты")

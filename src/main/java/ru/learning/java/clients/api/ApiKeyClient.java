@@ -26,17 +26,13 @@ public class ApiKeyClient extends ApiClient {
    * @param pathParams  параметры пути
    * @param queryParams параметры запроса
    */
-  public ValidatableResponse sendGetWithApiKeyHeader(
-    String url,
-    int statusCode,
-    String headerName,
-    String apiKey,
-    Map<String, String> headers,
-    Map<String, String> pathParams,
-    Map<String, String> queryParams
-  ) {
-    installSpecification(requestSpecification(), responseSpecification());
+  public ValidatableResponse sendGetWithApiKeyHeader(String url, int statusCode,
+                                                     String headerName, String apiKey,
+                                                     Map<String, String> headers,
+                                                     Map<String, String> pathParams,
+                                                     Map<String, String> queryParams) {
     return given()
+      .spec(requestSpecification())
       .header(headerName, apiKey)
       .headers(headers)
       .pathParams(pathParams)
@@ -44,25 +40,29 @@ public class ApiKeyClient extends ApiClient {
       .when()
       .get(url)
       .then()
+      .spec(responseSpecification())
       .assertThat().statusCode(statusCode)
-      .log().ifError();
+      .log().all();
   }
 
   /**
    * [POST] с API Key в заголовке
+   * @param url         адрес сервиса
+   * @param statusCode  ожидаемый статус код
+   * @param headerName  имя заголовка (например, "X-API-Key", "Authorization")
+   * @param apiKey      значение ключа
+   * @param body        тело запроса
+   * @param headers     дополнительные заголовки
+   * @param pathParams  параметры пути
+   * @param queryParams параметры запроса
    */
-  public ValidatableResponse sendPostWithApiKeyHeader(
-    String url,
-    int statusCode,
-    String headerName,
-    String apiKey,
-    Object body,
-    Map<String, String> headers,
-    Map<String, String> pathParams,
-    Map<String, String> queryParams
-  ) {
-    installSpecification(requestSpecification(), responseSpecification());
+  public ValidatableResponse sendPostWithApiKeyHeader(String url, int statusCode,
+                                                      String headerName, String apiKey,
+                                                      Object body, Map<String, String> headers,
+                                                      Map<String, String> pathParams,
+                                                      Map<String, String> queryParams) {
     return given()
+      .spec(requestSpecification())
       .header(headerName, apiKey)
       .headers(headers)
       .pathParams(pathParams)
@@ -71,8 +71,9 @@ public class ApiKeyClient extends ApiClient {
       .when()
       .post(url)
       .then()
+      .spec(responseSpecification())
       .assertThat().statusCode(statusCode)
-      .log().ifError();
+      .log().all();
   }
 
   // ── Через query-параметр ─────────────────────────────────────────────────
@@ -83,28 +84,25 @@ public class ApiKeyClient extends ApiClient {
    * @param paramName имя параметра (например, "api_key", "apikey", "key")
    * @param apiKey    значение ключа
    */
-  public ValidatableResponse sendGetWithApiKeyQuery(
-    String url,
-    int statusCode,
-    String paramName,
-    String apiKey,
-    Map<String, String> headers,
-    Map<String, String> pathParams,
-    Map<String, String> queryParams
-  ) {
+  public ValidatableResponse sendGetWithApiKeyQuery(String url, int statusCode,
+                                                    String paramName, String apiKey,
+                                                    Map<String, String> headers,
+                                                    Map<String, String> pathParams,
+                                                    Map<String, String> queryParams) {
     Map<String, String> allQueryParams = new HashMap<>(queryParams);
-    allQueryParams.put(paramName, apiKey); // добавляем ключ к остальным query params
+    allQueryParams.put(paramName, apiKey);
 
-    installSpecification(requestSpecification(), responseSpecification());
     return given()
+      .spec(requestSpecification())
       .headers(headers)
       .pathParams(pathParams)
       .queryParams(allQueryParams)
       .when()
       .get(url)
       .then()
+      .spec(responseSpecification())
       .assertThat().statusCode(statusCode)
-      .log().ifError();
+      .log().all();
   }
 
   // ── Через Basic Auth (key как username, пустой password) ─────────────────
@@ -113,26 +111,22 @@ public class ApiKeyClient extends ApiClient {
    * [GET] с API Key как Basic Auth username (Stripe-style)
    * Некоторые API (например, Stripe) принимают API key как Basic Auth username
    */
-  public ValidatableResponse sendGetWithApiKeyAsBasicAuth(
-    String url,
-    int statusCode,
-    String apiKey,
-    Map<String, String> headers,
-    Map<String, String> pathParams,
-    Map<String, String> queryParams
-  ) {
-    installSpecification(requestSpecification(), responseSpecification());
+  public ValidatableResponse sendGetWithApiKeyAsBasicAuth(String url, int statusCode,
+                                                          String apiKey,
+                                                          Map<String, String> headers,
+                                                          Map<String, String> pathParams,
+                                                          Map<String, String> queryParams) {
     return given()
-      .auth()
-      .preemptive()
-      .basic(apiKey, "")
+      .spec(requestSpecification())
+      .auth().preemptive().basic(apiKey, "")
       .headers(headers)
       .pathParams(pathParams)
       .queryParams(queryParams)
       .when()
       .get(url)
       .then()
+      .spec(responseSpecification())
       .assertThat().statusCode(statusCode)
-      .log().ifError();
+      .log().all();
   }
 }

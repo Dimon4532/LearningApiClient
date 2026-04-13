@@ -1,6 +1,6 @@
+
 package ru.learning.java.clients.api.base;
 
-import io.restassured.RestAssured;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.builder.ResponseSpecBuilder;
 import io.restassured.filter.log.LogDetail;
@@ -28,7 +28,6 @@ public abstract class Specification {
       .setAccept(ContentType.JSON)
       .log(LogDetail.ALL);
 
-    // Добавляем SSL настройки только если они указаны
     if (KEYSTORE != null && !KEYSTORE.isEmpty()) {
       builder.setKeyStore(KEYSTORE, KEYSTORE_PSW);
     }
@@ -46,13 +45,5 @@ public abstract class Specification {
     return new ResponseSpecBuilder()
       .log(LogDetail.ALL)
       .build();
-  }
-
-  /**
-   * Метод для инсталяции спецификаций в клиенты сервисов
-   */
-  public void installSpecification(RequestSpecification requestSpec, ResponseSpecification responseSpec) {
-    RestAssured.requestSpecification = requestSpec;
-    RestAssured.responseSpecification = responseSpec;
   }
 }

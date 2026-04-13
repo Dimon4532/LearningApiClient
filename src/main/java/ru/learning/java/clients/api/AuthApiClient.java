@@ -23,25 +23,21 @@ public class AuthApiClient extends ApiClient {
    * @param pathParams  параметры пути запроса
    * @param queryParams параметры запроса
    */
-  public ValidatableResponse sendGetWithAuth(String url,
-                                             int statusCode,
-                                             String login,
-                                             String password,
-                                             Map<String, String> headers,
-                                             Map<String, String> pathParams,
+  public ValidatableResponse sendGetWithAuth(String url, int statusCode, String login, String password,
+                                             Map<String, String> headers, Map<String, String> pathParams,
                                              Map<String, String> queryParams) {
-    installSpecification(requestSpecification(), responseSpecification());
     return given()
-      .auth()
-      .basic(login, password)
+      .spec(requestSpecification())
+      .auth().basic(login, password)
       .headers(headers)
       .pathParams(pathParams)
       .queryParams(queryParams)
       .when()
       .get(url)
       .then()
+      .spec(responseSpecification())
       .assertThat().statusCode(statusCode)
-      .log().ifError();
+      .log().all();
   }
 
   /**
@@ -56,18 +52,12 @@ public class AuthApiClient extends ApiClient {
    * @param pathParams  параметры пути запроса
    * @param queryParams параметры запроса
    */
-  public ValidatableResponse sendPostWithAuth(String url,
-                                              int statusCode,
-                                              String login,
-                                              String password,
-                                              Object body,
-                                              Map<String, String> headers,
-                                              Map<String, String> pathParams,
-                                              Map<String, String> queryParams) {
-    installSpecification(requestSpecification(), responseSpecification());
+  public ValidatableResponse sendPostWithAuth(String url, int statusCode, String login, String password,
+                                              Object body, Map<String, String> headers,
+                                              Map<String, String> pathParams, Map<String, String> queryParams) {
     return given()
-      .auth()
-      .basic(login, password)
+      .spec(requestSpecification())
+      .auth().basic(login, password)
       .headers(headers)
       .pathParams(pathParams)
       .queryParams(queryParams)
@@ -75,8 +65,9 @@ public class AuthApiClient extends ApiClient {
       .when()
       .post(url)
       .then()
+      .spec(responseSpecification())
       .assertThat().statusCode(statusCode)
-      .log().ifError();
+      .log().all();
   }
 
   /**
@@ -91,18 +82,12 @@ public class AuthApiClient extends ApiClient {
    * @param pathParams  параметры пути запроса
    * @param queryParams параметры запроса
    */
-  public ValidatableResponse sendPutWithAuth(String url,
-                                             int statusCode,
-                                             String login,
-                                             String password,
-                                             Object body,
-                                             Map<String, String> headers,
-                                             Map<String, String> pathParams,
-                                             Map<String, String> queryParams) {
-    installSpecification(requestSpecification(), responseSpecification());
+  public ValidatableResponse sendPutWithAuth(String url, int statusCode, String login, String password,
+                                             Object body, Map<String, String> headers,
+                                             Map<String, String> pathParams, Map<String, String> queryParams) {
     return given()
-      .auth()
-      .basic(login, password)
+      .spec(requestSpecification())
+      .auth().basic(login, password)
       .headers(headers)
       .pathParams(pathParams)
       .queryParams(queryParams)
@@ -110,8 +95,9 @@ public class AuthApiClient extends ApiClient {
       .when()
       .put(url)
       .then()
+      .spec(responseSpecification())
       .assertThat().statusCode(statusCode)
-      .log().ifError();
+      .log().all();
   }
 
   /**
@@ -126,18 +112,12 @@ public class AuthApiClient extends ApiClient {
    * @param pathParams  параметры пути запроса
    * @param queryParams параметры запроса
    */
-  public ValidatableResponse sendPatchWithAuth(String url,
-                                               int statusCode,
-                                               String login,
-                                               String password,
-                                               Object body,
-                                               Map<String, String> headers,
-                                               Map<String, String> pathParams,
-                                               Map<String, String> queryParams) {
-    installSpecification(requestSpecification(), responseSpecification());
+  public ValidatableResponse sendPatchWithAuth(String url, int statusCode, String login, String password,
+                                               Object body, Map<String, String> headers,
+                                               Map<String, String> pathParams, Map<String, String> queryParams) {
     return given()
-      .auth()
-      .basic(login, password)
+      .spec(requestSpecification())
+      .auth().basic(login, password)
       .headers(headers)
       .pathParams(pathParams)
       .queryParams(queryParams)
@@ -145,8 +125,9 @@ public class AuthApiClient extends ApiClient {
       .when()
       .patch(url)
       .then()
+      .spec(responseSpecification())
       .assertThat().statusCode(statusCode)
-      .log().ifError();
+      .log().all();
   }
 
   /**
@@ -160,25 +141,21 @@ public class AuthApiClient extends ApiClient {
    * @param pathParams  параметры пути запроса
    * @param queryParams параметры запроса
    */
-  public ValidatableResponse sendDeleteWithAuth(String url,
-                                                int statusCode,
-                                                String login,
-                                                String password,
-                                                Map<String, String> headers,
-                                                Map<String, String> pathParams,
+  public ValidatableResponse sendDeleteWithAuth(String url, int statusCode, String login, String password,
+                                                Map<String, String> headers, Map<String, String> pathParams,
                                                 Map<String, String> queryParams) {
-    installSpecification(requestSpecification(), responseSpecification());
     return given()
-      .auth()
-      .basic(login, password)
+      .spec(requestSpecification())
+      .auth().basic(login, password)
       .headers(headers)
       .pathParams(pathParams)
       .queryParams(queryParams)
       .when()
       .delete(url)
       .then()
+      .spec(responseSpecification())
       .assertThat().statusCode(statusCode)
-      .log().ifError();
+      .log().all();
   }
 
   // ==================== BEARER TOKEN МЕТОДЫ ====================
@@ -194,14 +171,11 @@ public class AuthApiClient extends ApiClient {
    * @param pathParams  параметры пути запроса
    * @param queryParams параметры запроса
    */
-  public ValidatableResponse sendPostForToken(String url,
-                                              int statusCode,
-                                              Object body,
-                                              Map<String, String> headers,
-                                              Map<String, String> pathParams,
+  public ValidatableResponse sendPostForToken(String url, int statusCode, Object body,
+                                              Map<String, String> headers, Map<String, String> pathParams,
                                               Map<String, String> queryParams) {
-    installSpecification(requestSpecification(), responseSpecification());
     return given()
+      .spec(requestSpecification())
       .headers(headers)
       .pathParams(pathParams)
       .queryParams(queryParams)
@@ -209,6 +183,7 @@ public class AuthApiClient extends ApiClient {
       .when()
       .post(url)
       .then()
+      .spec(responseSpecification())
       .assertThat().statusCode(statusCode)
       .log().all();
   }
@@ -223,24 +198,21 @@ public class AuthApiClient extends ApiClient {
    * @param pathParams  параметры пути запроса
    * @param queryParams параметры запроса
    */
-  public ValidatableResponse sendGetWithBearerToken(String url,
-                                                    int statusCode,
-                                                    String token,
-                                                    Map<String, String> headers,
-                                                    Map<String, String> pathParams,
+  public ValidatableResponse sendGetWithBearerToken(String url, int statusCode, String token,
+                                                    Map<String, String> headers, Map<String, String> pathParams,
                                                     Map<String, String> queryParams) {
-    installSpecification(requestSpecification(), responseSpecification());
     return given()
-      .auth()
-      .oauth2(token)
+      .spec(requestSpecification())
+      .auth().oauth2(token)
       .headers(headers)
       .pathParams(pathParams)
       .queryParams(queryParams)
       .when()
       .get(url)
       .then()
+      .spec(responseSpecification())
       .assertThat().statusCode(statusCode)
-      .log().ifError();
+      .log().all();
   }
 
   /**
@@ -254,17 +226,12 @@ public class AuthApiClient extends ApiClient {
    * @param pathParams  параметры пути запроса
    * @param queryParams параметры запроса
    */
-  public ValidatableResponse sendPostWithBearerToken(String url,
-                                                     int statusCode,
-                                                     String token,
-                                                     Object body,
-                                                     Map<String, String> headers,
-                                                     Map<String, String> pathParams,
-                                                     Map<String, String> queryParams) {
-    installSpecification(requestSpecification(), responseSpecification());
+  public ValidatableResponse sendPostWithBearerToken(String url, int statusCode, String token,
+                                                     Object body, Map<String, String> headers,
+                                                     Map<String, String> pathParams, Map<String, String> queryParams) {
     return given()
-      .auth()
-      .oauth2(token)
+      .spec(requestSpecification())
+      .auth().oauth2(token)
       .headers(headers)
       .pathParams(pathParams)
       .queryParams(queryParams)
@@ -272,8 +239,9 @@ public class AuthApiClient extends ApiClient {
       .when()
       .post(url)
       .then()
+      .spec(responseSpecification())
       .assertThat().statusCode(statusCode)
-      .log().ifError();
+      .log().all();
   }
 
   /**
@@ -287,17 +255,12 @@ public class AuthApiClient extends ApiClient {
    * @param pathParams  параметры пути запроса
    * @param queryParams параметры запроса
    */
-  public ValidatableResponse sendPutWithBearerToken(String url,
-                                                    int statusCode,
-                                                    String token,
-                                                    Object body,
-                                                    Map<String, String> headers,
-                                                    Map<String, String> pathParams,
-                                                    Map<String, String> queryParams) {
-    installSpecification(requestSpecification(), responseSpecification());
+  public ValidatableResponse sendPutWithBearerToken(String url, int statusCode, String token,
+                                                    Object body, Map<String, String> headers,
+                                                    Map<String, String> pathParams, Map<String, String> queryParams) {
     return given()
-      .auth()
-      .oauth2(token)
+      .spec(requestSpecification())
+      .auth().oauth2(token)
       .headers(headers)
       .pathParams(pathParams)
       .queryParams(queryParams)
@@ -305,8 +268,9 @@ public class AuthApiClient extends ApiClient {
       .when()
       .put(url)
       .then()
+      .spec(responseSpecification())
       .assertThat().statusCode(statusCode)
-      .log().ifError();
+      .log().all();
   }
 
   /**
@@ -320,17 +284,12 @@ public class AuthApiClient extends ApiClient {
    * @param pathParams  параметры пути запроса
    * @param queryParams параметры запроса
    */
-  public ValidatableResponse sendPatchWithBearerToken(String url,
-                                                      int statusCode,
-                                                      String token,
-                                                      Object body,
-                                                      Map<String, String> headers,
-                                                      Map<String, String> pathParams,
-                                                      Map<String, String> queryParams) {
-    installSpecification(requestSpecification(), responseSpecification());
+  public ValidatableResponse sendPatchWithBearerToken(String url, int statusCode, String token,
+                                                      Object body, Map<String, String> headers,
+                                                      Map<String, String> pathParams, Map<String, String> queryParams) {
     return given()
-      .auth()
-      .oauth2(token)
+      .spec(requestSpecification())
+      .auth().oauth2(token)
       .headers(headers)
       .pathParams(pathParams)
       .queryParams(queryParams)
@@ -338,8 +297,9 @@ public class AuthApiClient extends ApiClient {
       .when()
       .patch(url)
       .then()
+      .spec(responseSpecification())
       .assertThat().statusCode(statusCode)
-      .log().ifError();
+      .log().all();
   }
 
   /**
@@ -352,23 +312,20 @@ public class AuthApiClient extends ApiClient {
    * @param pathParams  параметры пути запроса
    * @param queryParams параметры запроса
    */
-  public ValidatableResponse sendDeleteWithBearerToken(String url,
-                                                       int statusCode,
-                                                       String token,
-                                                       Map<String, String> headers,
-                                                       Map<String, String> pathParams,
+  public ValidatableResponse sendDeleteWithBearerToken(String url, int statusCode, String token,
+                                                       Map<String, String> headers, Map<String, String> pathParams,
                                                        Map<String, String> queryParams) {
-    installSpecification(requestSpecification(), responseSpecification());
     return given()
-      .auth()
-      .oauth2(token)
+      .spec(requestSpecification())
+      .auth().oauth2(token)
       .headers(headers)
       .pathParams(pathParams)
       .queryParams(queryParams)
       .when()
       .delete(url)
       .then()
+      .spec(responseSpecification())
       .assertThat().statusCode(statusCode)
-      .log().ifError();
+      .log().all();
   }
 }

@@ -45,7 +45,7 @@ public class OAuthApiClient extends AuthApiClient {
       .post(tokenUrl)
       .then()
       .assertThat().statusCode(200)
-      .log().ifError()
+      .log().all()
       .extract()
       .jsonPath()
       .getString("access_token");
@@ -55,6 +55,13 @@ public class OAuthApiClient extends AuthApiClient {
 
   /**
    * Получение токена через Resource Owner Password grant
+   *
+   * @param tokenUrl     URL эндпоинта токена (например, /oauth/token)
+   * @param clientId     идентификатор клиента
+   * @param clientSecret секрет клиента
+   * @param username     логин пользователя
+   * @param password     пароль пользователя
+   * @param scope        область видимости (scope) для токена
    */
   public String fetchTokenPassword(
     String tokenUrl,
@@ -81,7 +88,7 @@ public class OAuthApiClient extends AuthApiClient {
       .post(tokenUrl)
       .then()
       .assertThat().statusCode(200)
-      .log().ifError()
+      .log().all()
       .extract()
       .jsonPath()
       .getString("access_token");
@@ -91,6 +98,11 @@ public class OAuthApiClient extends AuthApiClient {
 
   /**
    * Обновление токена через Refresh Token grant
+   *
+   * @param tokenUrl     URL эндпоинта токена
+   * @param clientId     идентификатор клиента
+   * @param clientSecret секрет клиента
+   * @param refreshToken обновляемый токен
    */
   public String refreshToken(
     String tokenUrl,
@@ -108,7 +120,7 @@ public class OAuthApiClient extends AuthApiClient {
       .post(tokenUrl)
       .then()
       .assertThat().statusCode(200)
-      .log().ifError()
+      .log().all()
       .extract()
       .jsonPath()
       .getString("access_token");

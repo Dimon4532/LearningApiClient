@@ -19,7 +19,6 @@ public class HttpRequestActor extends AbstractBehavior<HttpRequestActor.Command>
 
   private final ApiClient apiClient;
 
-  // Интерфейс команд
   public interface Command {
   }
 
