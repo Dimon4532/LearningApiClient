@@ -1,8 +1,6 @@
 package ru.learning.java.clients.api.base;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.restassured.RestAssured;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import ru.learning.java.clients.api.ApiClient;
 import ru.learning.java.clients.api.ApiKeyClient;
