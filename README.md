@@ -30,7 +30,7 @@
 - ✅ **Гибкую архитектуру** с паттерном API Client и единым базовым классом `BaseApiTest`
 - ✅ **Интеграцию с Allure** для красивых отчетов
 - ✅ **Акторную модель** с Apache Pekko для асинхронных запросов
-- ✅ **Поддержку различных типов аутентификации** (Basic Auth, Bearer Token, OAuth 2.0, API Keys)
+- ✅ **Поддержку различных типов аутентификации** (Basic Auth, Bearer Token, OAuth 2.0, JWT, API Keys)
 - ✅ **Работу с различными форматами** (JSON, Form Data, Multipart, XML, SOAP)
 - ✅ **WireMock** для изолированного тестирования OAuth 2.0 без внешних зависимостей
 
@@ -301,7 +301,8 @@ void testGetRequestWithActor() throws ExecutionException, InterruptedException {
 ```text
 ApiClient  (базовые HTTP операции: GET, POST, PUT, PATCH, DELETE)
 ├── AuthApiClient  (Basic Auth + Bearer Token)
-│   └── OAuthApiClient  (OAuth 2.0: Client Credentials, Password, Refresh Token)
+│   ├── OAuthApiClient  (OAuth 2.0: Client Credentials, Password, Refresh Token)
+│   └── JwtApiClient  (JWT: получение JWT и запрос с использованием полученного JWT)
 ├── ApiKeyClient  (API Keys: header / query-param / Stripe-style Basic Auth)
 ├── FormApiClient  (application/x-www-form-urlencoded + cookies)
 ├── MultipartApiClient  (multipart/form-data, загрузка файлов)
