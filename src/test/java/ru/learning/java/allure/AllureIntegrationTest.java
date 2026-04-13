@@ -36,7 +36,7 @@ public class AllureIntegrationTest extends SpecificationTest {
   @Description("Все детали запроса и ответа автоматически попадают в Allure отчет")
   @Severity(SeverityLevel.CRITICAL)
   void testGetWithAllureLogging() {
-    Response response = given()
+    Response response = given(requestSpecification())
       .when()
       .get(BASE_URL + "/users/1")
       .then()
@@ -68,7 +68,7 @@ public class AllureIntegrationTest extends SpecificationTest {
 
     Allure.step("Создание запроса на создание пользователя", () -> Allure.addAttachment("User Data", "application/json", newUser.toString()));
 
-    Response response = given()
+    Response response = given(requestSpecification())
       .body(newUser)
       .when()
       .post(BASE_URL + "/users")
@@ -97,7 +97,7 @@ public class AllureIntegrationTest extends SpecificationTest {
       Allure.parameter("postId", "1");
     });
 
-    Response response = given()
+    Response response = given(requestSpecification())
       .queryParams(queryParams)
       .when()
       .get(BASE_URL + "/comments")
@@ -132,7 +132,7 @@ public class AllureIntegrationTest extends SpecificationTest {
   void testCreatePostWithSteps() {
     Post newPost = Allure.step("Подготовка данных для поста", () -> new Post(1L, null, "Allure Test Post", "Testing with Allure reporting"));
 
-    Response response = Allure.step("Отправка POST запроса", () -> given()
+    Response response = Allure.step("Отправка POST запроса", () -> given(requestSpecification())
       .body(newPost)
       .when()
       .post(BASE_URL + "/posts")
@@ -166,7 +166,7 @@ public class AllureIntegrationTest extends SpecificationTest {
         .username("complexuser")
         .build();
 
-      Response response = given()
+      Response response = given(requestSpecification())
         .body(newUser)
         .when()
         .post(BASE_URL + "/users")
@@ -182,7 +182,7 @@ public class AllureIntegrationTest extends SpecificationTest {
     Long postId = Allure.step("Шаг 2: Создание поста", () -> {
       Post post = new Post(1L, null, "User's First Post", "Content created in complex scenario");
 
-      Response response = given()
+      Response response = given(requestSpecification())
         .body(post)
         .when()
         .post(BASE_URL + "/posts")
@@ -200,7 +200,7 @@ public class AllureIntegrationTest extends SpecificationTest {
       Map<String, String> queryParams = new HashMap<>();
       queryParams.put("postId", "1");
 
-      Response response = given()
+      Response response = given(requestSpecification())
         .queryParams(queryParams)
         .when()
         .get(BASE_URL + "/comments")
@@ -246,7 +246,7 @@ public class AllureIntegrationTest extends SpecificationTest {
         """, user.getName(), user.getEmail(), user.getUsername())
     );
 
-    Response response = given()
+    Response response = given(requestSpecification())
       .body(user)
       .when()
       .post(BASE_URL + "/users")
@@ -274,7 +274,7 @@ public class AllureIntegrationTest extends SpecificationTest {
     Allure.step("Попытка получить несуществующий ресурс", () -> {
       Allure.parameter("User ID", "999999");
 
-      Response response = given()
+      Response response = given(requestSpecification())
         .when()
         .get(BASE_URL + "/users/999999")
         .then()
