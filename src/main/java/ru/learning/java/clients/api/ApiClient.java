@@ -20,8 +20,8 @@ public class ApiClient extends Specification {
                                      Map<String, String> headers, Map<String, String> pathParams,
                                      Map<String, String> queryParams, Map<String, String> cookies
   ) {
-    installSpecification(requestSpecification(), responseSpecification());
     return given()
+      .spec(requestSpecification())
       .redirects().follow(false)
       .headers(headers)
       .log().cookies()
@@ -32,6 +32,7 @@ public class ApiClient extends Specification {
       .when()
       .get(url)
       .then()
+      .spec(responseSpecification())
       .log().all();
   }
 
@@ -49,8 +50,8 @@ public class ApiClient extends Specification {
                                       Map<String, String> headers, Map<String, String> pathParams,
                                       Map<String, String> queryParams
   ) {
-    installSpecification(requestSpecification(), responseSpecification());
     return given()
+      .spec(requestSpecification())
       .redirects().follow(false)
       .headers(headers)
       .log().cookies()
@@ -61,6 +62,7 @@ public class ApiClient extends Specification {
       .when()
       .post(url)
       .then()
+      .spec(responseSpecification())
       .assertThat().statusCode(statusCode)
       .log().all();
   }
@@ -79,8 +81,8 @@ public class ApiClient extends Specification {
                                      Map<String, String> headers, Map<String, String> pathParams,
                                      Map<String, String> queryParams
   ) {
-    installSpecification(requestSpecification(), responseSpecification());
     return given()
+      .spec(requestSpecification())
       .headers(headers)
       .pathParams(pathParams)
       .queryParams(queryParams)
@@ -88,8 +90,9 @@ public class ApiClient extends Specification {
       .when()
       .put(url)
       .then()
+      .spec(responseSpecification())
       .assertThat().statusCode(statusCode)
-      .log().ifError();
+      .log().all();
   }
 
   /**
@@ -106,8 +109,8 @@ public class ApiClient extends Specification {
                                        Map<String, String> headers, Map<String, String> pathParams,
                                        Map<String, String> queryParams
   ) {
-    installSpecification(requestSpecification(), responseSpecification());
     return given()
+      .spec(requestSpecification())
       .headers(headers)
       .pathParams(pathParams)
       .queryParams(queryParams)
@@ -115,8 +118,9 @@ public class ApiClient extends Specification {
       .when()
       .patch(url)
       .then()
+      .spec(responseSpecification())
       .assertThat().statusCode(statusCode)
-      .log().ifError();
+      .log().all();
   }
 
   /**
@@ -131,15 +135,16 @@ public class ApiClient extends Specification {
   public void sendDelete(String url, int statusCode,
                          Map<String, String> headers, Map<String, String> pathParams, Map<String, String> queryParams
   ) {
-    installSpecification(requestSpecification(), responseSpecification());
     given()
+      .spec(requestSpecification())
       .headers(headers)
       .pathParams(pathParams)
       .queryParams(queryParams)
       .when()
       .delete(url)
       .then()
+      .spec(responseSpecification())
       .assertThat().statusCode(statusCode)
-      .log().ifError();
+      .log().all();
   }
 }

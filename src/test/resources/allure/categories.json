@@ -1,0 +1,26 @@
+[
+  {
+    "name": "Product Defects",
+    "messageRegex": ".*AssertionError.*",
+    "matchedStatuses": ["failed"]
+  },
+  {
+    "name": "Test Defects",
+    "messageRegex": ".*",
+    "matchedStatuses": ["broken"]
+  },
+  {
+    "name": "Ignored Tests",
+    "matchedStatuses": ["skipped"]
+  },
+  {
+    "name": "API Authentication Tests",
+    "traceRegex": ".*AuthApiClient.*",
+    "matchedStatuses": ["passed", "failed"]
+  },
+  {
+    "name": "OAuth Tests",
+    "traceRegex": ".*OAuthApiClient.*",
+    "matchedStatuses": ["passed", "failed"]
+  }
+]

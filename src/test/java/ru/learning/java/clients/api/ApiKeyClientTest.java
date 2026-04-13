@@ -21,7 +21,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class ApiKeyClientTest extends BaseApiTest {
   private static final String FAKE_API_KEY = "test-api-key-12345";
 
-
   // ── API Key через заголовок ───────────────────────────────────────────────
 
   @Test

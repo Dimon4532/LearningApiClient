@@ -2,6 +2,7 @@ package ru.learning.java.clients.api;
 
 import io.restassured.http.ContentType;
 import io.restassured.response.ValidatableResponse;
+import io.restassured.specification.RequestSpecification;
 
 import java.io.File;
 import java.util.Map;
@@ -19,19 +20,17 @@ public class MultipartApiClient extends ApiClient {
    * @param fieldName  имя поля формы
    * @param headers    заголовки
    */
-  public ValidatableResponse uploadFile(String url,
-                                        int statusCode,
-                                        File file,
-                                        String fieldName,
-                                        Map<String, String> headers) {
-    installSpecification(requestSpecification(), responseSpecification());
+  public ValidatableResponse uploadFile(String url, int statusCode, File file,
+                                        String fieldName, Map<String, String> headers) {
     return given()
+      .spec(requestSpecification())
       .contentType(ContentType.MULTIPART)
       .headers(headers)
       .multiPart(fieldName, file)
       .when()
       .post(url)
       .then()
+      .spec(responseSpecification())
       .assertThat().statusCode(statusCode)
       .log().all();
   }
@@ -39,19 +38,20 @@ public class MultipartApiClient extends ApiClient {
   /**
    * [POST] загрузка файла + дополнительные поля формы
    */
-  public ValidatableResponse uploadFileWithFormData(String url,
-                                                    int statusCode,
-                                                    File file,
-                                                    String fieldName,
-                                                    Map<String, String> formFields,
+  public ValidatableResponse uploadFileWithFormData(String url, int statusCode, File file,
+                                                    String fieldName, Map<String, String> formFields,
                                                     Map<String, String> headers) {
-    installSpecification(requestSpecification(), responseSpecification());
-    var request = given()
+    RequestSpecification request = given()
+      .spec(requestSpecification())
       .contentType(ContentType.MULTIPART)
       .headers(headers)
       .multiPart(fieldName, file);
     formFields.forEach(request::multiPart);
+
     return request.when().post(url)
-      .then().assertThat().statusCode(statusCode).log().all();
+                  .then()
+                  .spec(responseSpecification())
+                  .assertThat().statusCode(statusCode)
+                  .log().all();
   }
 }

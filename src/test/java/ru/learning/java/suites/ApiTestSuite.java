@@ -7,6 +7,7 @@ import ru.learning.java.clients.api.ApiClientTest;
 import ru.learning.java.clients.api.ApiKeyClientTest;
 import ru.learning.java.clients.api.AuthApiClientTest;
 import ru.learning.java.clients.api.FormApiClientTest;
+import ru.learning.java.clients.api.JwtApiClientTest;
 import ru.learning.java.clients.api.MultipartApiClientTest;
 import ru.learning.java.clients.api.OAuthApiClientTest;
 import ru.learning.java.clients.api.SoapApiClientTest;
@@ -19,10 +20,11 @@ import ru.learning.java.clients.api.XmlApiTest;
   ApiKeyClientTest.class,
   AuthApiClientTest.class,
   FormApiClientTest.class,
+  JwtApiClientTest.class,
   MultipartApiClientTest.class,
   OAuthApiClientTest.class,
-  XmlApiTest.class,
-  SoapApiClientTest.class
+  SoapApiClientTest.class,
+  XmlApiTest.class
 })
 public class ApiTestSuite {
 }
