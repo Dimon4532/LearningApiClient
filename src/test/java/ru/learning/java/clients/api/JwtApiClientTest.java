@@ -102,6 +102,23 @@ public class JwtApiClientTest extends BaseApiTest {
       .willReturn(aResponse()
         .withStatus(401)
         .withBody("{\"error\": \"Unauthorized\"}")));
+
+    // Стаб: POST /api/data с истёкшим токеном → 401
+    wireMock.stubFor(post(urlEqualTo("/api/data"))
+      .atPriority(2)
+      .withHeader("Authorization", equalTo("Bearer " + EXPIRED_JWT))
+      .willReturn(aResponse()
+        .withStatus(401)
+        .withBody("{\"error\": \"Token expired\"}")));
+
+    // Стаб: POST /api/data с валидным токеном → 201
+    wireMock.stubFor(post(urlEqualTo("/api/data"))
+      .atPriority(1)
+      .withHeader("Authorization", equalTo("Bearer " + VALID_JWT))
+      .willReturn(aResponse()
+        .withStatus(201)
+        .withHeader("Content-Type", "application/json")
+        .withBody("{\"id\": 42, \"status\": \"created\"}")));
   }
 
   @AfterAll
@@ -278,5 +295,38 @@ public class JwtApiClientTest extends BaseApiTest {
       .extract().response();
 
     assertThat(response.jsonPath().getString("error")).isEqualTo("Invalid credentials");
+  }
+
+  @Test
+  @Order(12)
+  @Story("Использование JWT токена")
+  @DisplayName("12. POST защищённого ресурса с валидным JWT → 201")
+  @Severity(SeverityLevel.BLOCKER)
+  void testPostProtectedResourceWithValidJwt() {
+    String token = jwtClient.fetchJwtToken(MOCK_URL + "/auth/login", "testuser", "password");
+    log.info("Fetched JWT token: {}", token);
+    String body = "{\"name\": \"test item\"}";
+
+    Response response = jwtClient
+      .sendPostWithJwt(
+        MOCK_URL + "/api/data", 201, token, body,
+        new HashMap<>(), new HashMap<>(), new HashMap<>()
+      )
+      .extract().response();
+
+    assertThat(response.jsonPath().getInt("id")).isEqualTo(42);
+    assertThat(response.jsonPath().getString("status")).isEqualTo("created");
+  }
+
+  @Test
+  @Order(13)
+  @Story("Негативные тесты")
+  @DisplayName("13. POST с истёкшим JWT → 401")
+  @Severity(SeverityLevel.CRITICAL)
+  void testPostWithExpiredJwtRejected() {
+    jwtClient.sendPostWithJwt(
+      MOCK_URL + "/api/data", 401, EXPIRED_JWT, "{}",
+      new HashMap<>(), new HashMap<>(), new HashMap<>()
+    );
   }
 }
