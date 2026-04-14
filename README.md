@@ -454,6 +454,20 @@ ApiClient  (базовые HTTP операции: GET, POST, PUT, PATCH, DELETE)
 - ✅ Вызов SOAP-метода NumberToWords и парсинг ответа
 - ✅ Валидация SOAP-ответа через XPath
 
+### JwtApiClientTest (11 тестов) — JWT токены
+
+- ✅ Получение JWT токена через POST /auth/login
+- ✅ Проверка структуры токена (header.payload.signature)
+- ✅ Парсинг claim `sub` (subject) из payload
+- ✅ Парсинг кастомного claim `name`
+- ✅ Проверка алгоритма подписи (`HS256`) из заголовка
+- ✅ Наличие claim `exp` (время истечения) в токене
+- ✅ Валидный токен: `exp` в будущем
+- ✅ Истёкший токен: `exp` в прошлом (определение локально, без сервера)
+- ✅ GET защищённого ресурса с валидным JWT → 200
+- ✅ Сервер отклоняет истёкший JWT → 401
+- ✅ Неверные credentials → 401 при получении токена
+
 ### AllureIntegrationTest — демонстрация Allure
 
 - ✅ Примеры использования аннотаций и вложений Allure
@@ -524,7 +538,7 @@ void testGetRequestWithActor() throws ExecutionException, InterruptedException {
 2. **Больше типов аутентификацией**
     - ~~OAuth 2.0 (полный flow)~~ → `OAuthApiClientTest` (WireMock)
     - ~~API Keys~~ → `ApiKeyClientTest`
-    - JWT токены (с проверкой expiration)
+    ~~- JWT токены (с проверкой expiration)~~ `JwtApiClientTest` (WireMock)
     - Digest Authentication
 
 3. **Улучшение моделей данных**
