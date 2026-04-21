@@ -1,0 +1,1 @@
+CreateUserRequest(name=Allure Test User, email=allure@test.com, username=allureuser)

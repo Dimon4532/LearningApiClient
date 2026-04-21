@@ -1,0 +1,6 @@
+{
+  "name": "Attachment Demo User",
+  "email": "attachment@demo.com",
+  "username": "attachdemo",
+  "id": 11
+}
