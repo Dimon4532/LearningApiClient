@@ -17,11 +17,16 @@ import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import ru.learning.java.clients.api.base.BaseApiTest;
 
 import java.time.Instant;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.function.Function;
+import java.util.stream.Stream;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.containing;
@@ -51,6 +56,12 @@ public class JwtApiClientTest extends BaseApiTest {
   private static final String EXPIRED_JWT =
     "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9" +
       ".eyJzdWIiOiJ1c2VyMSIsIm5hbWUiOiJUZXN0IFVzZXIiLCJpYXQiOjE0MDAwMDAwMDAsImV4cCI6MTQwMDAwMDAwMX0.signature";
+
+  private static final String REFRESHED_JWT =
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9" +
+      ".eyJzdWIiOiJ1c2VyMSIsIm5hbWUiOiJUZXN0IFVzZXIiLCJpYXQiOjE3MDAwMDAxMDAsImV4cCI6OTk5OTk5OTk5OX0.newsignature";
+
+  private static final String REFRESH_TOKEN = "opaque-refresh-token-value";
 
   private static String MOCK_URL;
 
@@ -119,11 +130,60 @@ public class JwtApiClientTest extends BaseApiTest {
         .withStatus(201)
         .withHeader("Content-Type", "application/json")
         .withBody("{\"id\": 42, \"status\": \"created\"}")));
+
+    // Стаб: POST /auth/login → возвращает токен + refresh_token
+    wireMock.stubFor(post(urlEqualTo("/auth/login"))
+      .withRequestBody(containing("testuser"))
+      .willReturn(aResponse()
+        .withStatus(200)
+        .withHeader("Content-Type", "application/json")
+        .withBody("{\"token\":\"" + VALID_JWT + "\","
+          + "\"refresh_token\":\"" + REFRESH_TOKEN + "\","
+          + "\"token_type\":\"Bearer\","
+          + "\"expires_in\":3600}")));
+
+    // Стаб: POST /auth/refresh с валидным refresh_token → новый JWT
+    wireMock.stubFor(post(urlEqualTo("/auth/refresh"))
+      .withRequestBody(containing(REFRESH_TOKEN))
+      .willReturn(aResponse()
+        .withStatus(200)
+        .withHeader("Content-Type", "application/json")
+        .withBody("{\"token\":\"" + REFRESHED_JWT + "\","
+          + "\"expires_in\":3600}")));
+
+    // Стаб: POST /auth/refresh с невалидным refresh_token → 401
+    wireMock.stubFor(post(urlEqualTo("/auth/refresh"))
+      .withRequestBody(containing("invalid-token"))
+      .willReturn(aResponse()
+        .withStatus(401)
+        .withBody("{\"error\":\"Invalid refresh token\"}")));
+
+    // Стаб: GET /api/protected с обновлённым токеном → 200
+    wireMock.stubFor(get(urlEqualTo("/api/protected"))
+      .atPriority(1)
+      .withHeader("Authorization", containing("Bearer " + REFRESHED_JWT))
+      .willReturn(aResponse()
+        .withStatus(200)
+        .withHeader("Content-Type", "application/json")
+        .withBody("{\"data\":\"refreshed content\",\"user\":\"user1\"}")));
   }
 
   @AfterAll
   static void tearDown() {
     wireMock.stop();
+  }
+
+  private String fetchRefreshToken() {
+    return given()
+      .contentType("application/json")
+      .body("{\"username\": \"testuser\", \"password\": \"password\"}")
+      .when()
+      .post(MOCK_URL + "/auth/login")
+      .then()
+      .statusCode(200)
+      .extract()
+      .jsonPath()
+      .getString("refresh_token");
   }
 
   // ── Получение токена ──────────────────────────────────────────────────────
@@ -304,7 +364,7 @@ public class JwtApiClientTest extends BaseApiTest {
   @Severity(SeverityLevel.BLOCKER)
   void testPostProtectedResourceWithValidJwt() {
     String token = jwtClient.fetchJwtToken(MOCK_URL + "/auth/login", "testuser", "password");
-    log.info("Fetched JWT token: {}", token);
+    log.info("Fetched JWT token for POST: {}", token);
     String body = "{\"name\": \"test item\"}";
 
     Response response = jwtClient
@@ -328,5 +388,151 @@ public class JwtApiClientTest extends BaseApiTest {
       MOCK_URL + "/api/data", 401, EXPIRED_JWT, "{}",
       new HashMap<>(), new HashMap<>(), new HashMap<>()
     );
+  }
+
+  // ── Проверка iat ──────────────────────────────────────────────────────────
+
+  @Test
+  @Order(14)
+  @Story("Проверка expiration")
+  @DisplayName("14. Токен имеет поле iat (время выдачи)")
+  @Severity(SeverityLevel.NORMAL)
+  void testJwtHasIssuedAtClaim() {
+    String token = jwtClient.fetchJwtToken(MOCK_URL + "/auth/login", "testuser", "password");
+
+    DecodedJWT decoded = JWT.decode(token);
+    // iat должен присутствовать — токен без времени выдачи подозрителен
+    assertThat(decoded.getIssuedAt()).isNotNull();
+  }
+
+  @Test
+  @Order(15)
+  @Story("Проверка expiration")
+  @DisplayName("15. iat меньше exp — токен выдан до истечения")
+  @Severity(SeverityLevel.NORMAL)
+  void testJwtIssuedBeforeExpiration() {
+    String token = jwtClient.fetchJwtToken(MOCK_URL + "/auth/login", "testuser", "password");
+
+    DecodedJWT decoded = JWT.decode(token);
+    Instant issuedAt  = decoded.getIssuedAt().toInstant();
+    Instant expiresAt = decoded.getExpiresAt().toInstant();
+
+    // Если iat >= exp — токен логически сломан
+    assertThat(issuedAt).isBefore(expiresAt);
+  }
+
+  @Test
+  @Order(16)
+  @Story("Проверка expiration")
+  @DisplayName("16. iat в прошлом — токен уже был выдан")
+  @Severity(SeverityLevel.NORMAL)
+  void testJwtIssuedInThePast() {
+    String token = jwtClient.fetchJwtToken(MOCK_URL + "/auth/login", "testuser", "password");
+
+    DecodedJWT decoded = JWT.decode(token);
+    Instant issuedAt = decoded.getIssuedAt().toInstant();
+
+    // Токен не может быть выдан в будущем
+    assertThat(issuedAt).isBefore(Instant.now());
+  }
+
+  // ── Параметризованная проверка claims ─────────────────────────────────────
+
+  /**
+   * Источник данных: имя claim → ожидаемое строковое значение (null = только проверка наличия)
+   */
+  static Stream<Arguments> jwtClaimsProvider() {
+    return Stream.of(
+      Arguments.of("sub",  "user1"),      // subject — идентификатор пользователя
+      Arguments.of("name", "Test User")   // кастомный claim с именем
+    );
+  }
+
+  @ParameterizedTest(name = "Claim ''{0}'' = ''{1}''")
+  @MethodSource("jwtClaimsProvider")
+  @Order(17)
+  @Story("Парсинг JWT claims")
+  @DisplayName("17. Параметризованная проверка string-claims")
+  @Severity(SeverityLevel.NORMAL)
+  void testJwtClaimsParameterized(String claimName, String expectedValue) {
+    String token = jwtClient.fetchJwtToken(MOCK_URL + "/auth/login", "testuser", "password");
+
+    DecodedJWT decoded = JWT.decode(token);
+    String actualValue = decoded.getClaim(claimName).asString();
+
+    assertThat(actualValue)
+      .as("Claim '%s'", claimName)
+      .isEqualTo(expectedValue);
+  }
+
+  /**
+   * Источник данных для проверки наличия временных claims
+   */
+  static Stream<Arguments> jwtTimestampClaimsProvider() {
+    return Stream.of(
+      Arguments.of("iat", (Function<DecodedJWT, Date>) DecodedJWT::getIssuedAt),
+      Arguments.of("exp", (Function<DecodedJWT, Date>) DecodedJWT::getExpiresAt)
+    );
+  }
+
+  @ParameterizedTest(name = "Timestamp claim ''{0}'' not null")
+  @MethodSource("jwtTimestampClaimsProvider")
+  @Order(18)
+  @Story("Парсинг JWT claims")
+  @DisplayName("18. Параметризованная проверка timestamp-claims")
+  @Severity(SeverityLevel.NORMAL)
+  void testJwtTimestampClaimsParameterized(String claimName,
+                                           Function<DecodedJWT, Date> extractor) {
+    String token = jwtClient.fetchJwtToken(MOCK_URL + "/auth/login", "testuser", "password");
+
+    DecodedJWT decoded = JWT.decode(token);
+    Date value = extractor.apply(decoded);
+
+    assertThat(value)
+      .as("Timestamp claim '%s' should not be null", claimName)
+      .isNotNull();
+  }
+
+  // ── Рефреш токена ─────────────────────────────────────────────────────────
+
+  @Test
+  @Order(19)
+  @Story("Рефреш токена")
+  @DisplayName("19. Обновление токена через refresh_token")
+  @Severity(SeverityLevel.BLOCKER)
+  void testRefreshJwtToken() {
+    String refreshToken = fetchRefreshToken();
+    assertThat(refreshToken).isEqualTo(REFRESH_TOKEN);
+
+    String newToken = jwtClient.refreshJwtToken(MOCK_URL + "/auth/refresh", refreshToken);
+
+    assertThat(newToken).isNotBlank();
+    assertThat(newToken.split("\\.")).hasSize(3);
+  }
+
+  @Test
+  @Order(20)
+  @Story("Рефреш токена")
+  @DisplayName("20. Полный flow: логин → рефреш → защищённый ресурс")
+  @Description("Имитация сценария: исходный токен устарел, обновляем и используем новый")
+  @Severity(SeverityLevel.BLOCKER)
+  void testFullRefreshFlow() {
+    //TODO ЗАДАНИЕ
+  }
+
+  @Test
+  @Order(21)
+  @Story("Негативные тесты")
+  @DisplayName("21. Невалидный refresh_token → 401")
+  @Severity(SeverityLevel.CRITICAL)
+  void testInvalidRefreshTokenRejected() {
+    given()
+      .contentType("application/json")
+      .body("{\"refresh_token\": \"invalid-token\"}")
+      .when()
+      .post(MOCK_URL + "/auth/refresh")
+      .then()
+      .statusCode(401)
+      .extract().response();
   }
 }
