@@ -517,7 +517,21 @@ public class JwtApiClientTest extends BaseApiTest {
   @Description("Имитация сценария: исходный токен устарел, обновляем и используем новый")
   @Severity(SeverityLevel.BLOCKER)
   void testFullRefreshFlow() {
-    //TODO ЗАДАНИЕ
+    String refreshToken = fetchRefreshToken();
+    assertThat(refreshToken).isEqualTo(REFRESH_TOKEN);
+
+    String newToken = jwtClient.refreshJwtToken(MOCK_URL + "/auth/refresh", refreshToken);
+    log.info("Refreshed JWT: {}", newToken);
+
+    Response response = jwtClient
+      .sendGetWithJwt(
+        MOCK_URL + "/api/protected", 200, newToken,
+        new HashMap<>(), new HashMap<>(), new HashMap<>()
+      )
+      .extract().response();
+
+    assertThat(response.jsonPath().getString("data")).isEqualTo("refreshed content");
+
   }
 
   @Test
