@@ -538,7 +538,7 @@ void testGetRequestWithActor() throws ExecutionException, InterruptedException {
 2. **Больше типов аутентификацией**
     - ~~OAuth 2.0 (полный flow)~~ → `OAuthApiClientTest` (WireMock)
     - ~~API Keys~~ → `ApiKeyClientTest`
-    ~~- JWT токены (с проверкой expiration)~~ `JwtApiClientTest` (WireMock)
+    - ~~JWT токены (с проверкой expiration)~~ `JwtApiClientTest` (WireMock)
     - Digest Authentication
 
 3. **Улучшение моделей данных**
@@ -547,7 +547,7 @@ void testGetRequestWithActor() throws ExecutionException, InterruptedException {
     - Добавить примеры использования Immutables
 
 4. **Data-Driven тестирование**
-    - Параметризованные тесты с `@ParameterizedTest`
+    - ~~Параметризованные тесты с `@ParameterizedTest`~~ `SoapApiClientTest`
     - Чтение тестовых данных из CSV/JSON файлов
     - Использование TestNG DataProvider
 

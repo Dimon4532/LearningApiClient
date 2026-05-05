@@ -4,6 +4,7 @@ import io.qameta.allure.Epic;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
 import io.restassured.response.Response;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
@@ -22,6 +23,7 @@ import static org.hamcrest.Matchers.hasXPath;
 @Feature("SoapApiClient")
 @DisplayName("Тесты SoapApiClient")
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+@Slf4j
 public class SoapApiClientTest extends BaseApiTest {
 
   @Test
@@ -182,5 +184,78 @@ public class SoapApiClientTest extends BaseApiTest {
     assertThat(result)
       .as("Число %d должно содержать слово '%s'", number, expectedWord)
       .containsIgnoringCase(expectedWord);
+  }
+
+  // ── SOAP Fault ────────────────────────────────────────────────────────────
+
+  @Test
+  @Order(6)
+  @Story("SOAP Fault")
+  @DisplayName("6. SOAP — некорректный namespace возвращает Fault")
+  void testSoapFaultOnWrongNamespace() {
+    // Намеренно используем неверный namespace — сервер не найдёт метод
+    String invalidEnvelope = """
+    <?xml version="1.0" encoding="utf-8"?>
+    <soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+      <soap:Body>
+        <NumberToWords xmlns="http://wrong.namespace.example.com/">
+          <ubiNum>42</ubiNum>
+        </NumberToWords>
+      </soap:Body>
+    </soap:Envelope>
+    """;
+
+    Response response = soapApiClient
+      .sendSoapRequest(
+        SOAP_URL, invalidEnvelope,
+        "http://www.dataaccess.com/webservicesserver/NumberToWords",
+        new HashMap<>()
+      )
+      .extract().response();
+
+    // SOAP Fault может прийти как с 500, так и с 200 — зависит от сервера
+    assertThat(response.statusCode()).isIn(200, 500);
+
+    // Главное — в теле должен быть Fault
+    String body = response.asString();
+    assertThat(body).containsIgnoringCase("Fault");
+  }
+
+  @Test
+  @Order(7)
+  @Story("SOAP Fault")
+  @DisplayName("7. SOAP Fault содержит faultstring")
+  void testSoapFaultContainsFaultstring() {
+    String invalidEnvelope = """
+    <?xml version="1.0" encoding="utf-8"?>
+    <soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+      <soap:Body>
+        <NonExistentMethod xmlns="http://www.dataaccess.com/webservicesserver/">
+          <param>value</param>
+        </NonExistentMethod>
+      </soap:Body>
+    </soap:Envelope>
+    """;
+
+    Response response = soapApiClient
+      .sendSoapRequest(
+        SOAP_URL, invalidEnvelope,
+        "http://www.dataaccess.com/webservicesserver/NonExistentMethod",
+        new HashMap<>()
+      )
+      .extract().response();
+
+    assertThat(response.statusCode()).isIn(200, 500);
+
+    // Извлекаем faultstring через xmlPath — оба варианта namespace
+    String faultString = response.xmlPath().getString("**.find { it.name() == 'faultstring' }");
+
+    // Если xmlPath не сработал — проверяем сырую строку
+    if (faultString == null || faultString.isBlank()) {
+      assertThat(response.asString()).containsIgnoringCase("fault");
+    } else {
+      assertThat(faultString).isNotBlank();
+      log.info("SOAP Fault message: {}", faultString);
+    }
   }
 }
