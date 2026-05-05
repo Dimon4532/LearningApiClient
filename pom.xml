@@ -43,6 +43,12 @@
         <java-jwt.version>4.4.0</java-jwt.version>
         <!--  WireMock для мокирования OAuth сервера  -->
         <wiremock-standalone.version>3.10.0</wiremock-standalone.version>
+        <!--  Jakarta Bean Validation (JSR-380)  -->
+        <jakarta-validation-api.version>3.1.1</jakarta-validation-api.version>
+        <!--  Hibernate Validator — reference implementation  -->
+        <hibernate-validator.version>8.0.2.Final</hibernate-validator.version>
+        <!--  Expression Language — нужен Hibernate Validator для сообщений  -->
+        <expressly.version>5.0.0</expressly.version>
 
         <!--  Plugin  -->
         <!--  Maven Surefire  -->
@@ -164,6 +170,24 @@
             <artifactId>wiremock-standalone</artifactId>
             <version>${wiremock-standalone.version}</version>
             <scope>test</scope>
+        </dependency>
+        <!--  Jakarta Bean Validation API  -->
+        <dependency>
+            <groupId>jakarta.validation</groupId>
+            <artifactId>jakarta.validation-api</artifactId>
+            <version>${jakarta-validation-api.version}</version>
+        </dependency>
+        <!--  Hibernate Validator (имплементация)  -->
+        <dependency>
+            <groupId>org.hibernate.validator</groupId>
+            <artifactId>hibernate-validator</artifactId>
+            <version>${hibernate-validator.version}</version>
+        </dependency>
+        <!--  EL имплементация — обязательна для подстановки {value} в сообщениях  -->
+        <dependency>
+            <groupId>org.glassfish.expressly</groupId>
+            <artifactId>expressly</artifactId>
+            <version>${expressly.version}</version>
         </dependency>
     </dependencies>
     <build>

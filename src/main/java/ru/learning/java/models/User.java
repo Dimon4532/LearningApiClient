@@ -1,25 +1,39 @@
 package ru.learning.java.models;
 
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Positive;
 import lombok.Builder;
 
 /**
- * Модель пользователя (Java Record)
+ * Модель пользователя (Java Record) с поддержкой Bean Validation.
  */
 public record User(
-  Long id,
-  String name,
-  String email,
-  String username,
-  Address address,
+  @NotNull @Positive Long id,
+  @NotBlank String name,
+  @NotBlank @Email String email,
+  @NotBlank String username,
+  @Valid Address address,
+  @Pattern(regexp = "^[\\d\\s().+x-]+$", message = "phone has invalid format")
   String phone,
   String website,
-  Company company
+  @Valid Company company
 ) {
   @Builder
   public User {
   }
 
-  public record Address(String street, String suite, String city, String zipcode, Geo geo) {
+  public record Address(
+    @NotBlank String street,
+    String suite,
+    @NotBlank String city,
+    @Pattern(regexp = "^[\\d-]+$", message = "zipcode must contain only digits and '-'")
+    String zipcode,
+    @Valid Geo geo
+  ) {
     @Builder
     public Address {
     }
@@ -31,7 +45,11 @@ public record User(
     }
   }
 
-  public record Company(String name, String catchPhrase, String bs) {
+  public record Company(
+    @NotBlank String name,
+    String catchPhrase,
+    String bs
+  ) {
     @Builder
     public Company {
     }

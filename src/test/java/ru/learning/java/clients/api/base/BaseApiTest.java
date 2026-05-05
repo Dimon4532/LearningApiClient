@@ -5,6 +5,7 @@ import org.junit.jupiter.api.BeforeAll;
 import ru.learning.java.clients.api.ApiClient;
 import ru.learning.java.clients.api.ApiKeyClient;
 import ru.learning.java.clients.api.AuthApiClient;
+import ru.learning.java.clients.api.DigestApiClient;
 import ru.learning.java.clients.api.FormApiClient;
 import ru.learning.java.clients.api.JwtApiClient;
 import ru.learning.java.clients.api.MultipartApiClient;
@@ -23,6 +24,7 @@ public abstract class BaseApiTest {
   protected static MultipartApiClient multipartApiClient;
   protected static OAuthApiClient oAuthClient;
   protected static SoapApiClient soapApiClient;
+  protected static DigestApiClient digestApiClient;
 
   protected static ObjectMapper objectMapper;
 

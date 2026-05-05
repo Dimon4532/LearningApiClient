@@ -539,10 +539,10 @@ void testGetRequestWithActor() throws ExecutionException, InterruptedException {
     - ~~OAuth 2.0 (полный flow)~~ → `OAuthApiClientTest` (WireMock)
     - ~~API Keys~~ → `ApiKeyClientTest`
     - ~~JWT токены (с проверкой expiration)~~ `JwtApiClientTest` (WireMock)
-    - Digest Authentication
+    - ~~Digest Authentication~~ `DigestApiClientTest` (httpbin + WireMock)
 
 3. **Улучшение моделей данных**
-    - Добавить валидацию через Bean Validation (JSR-303)
+    - ~~Добавить валидацию через Bean Validation (JSR-303)~~ `ModelValidator` + аннотации в `User`/`CreateUserRequest`
     - Создать builders для всех моделей
     - Добавить примеры использования Immutables
 
