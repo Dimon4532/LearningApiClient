@@ -531,7 +531,6 @@ public class JwtApiClientTest extends BaseApiTest {
       .extract().response();
 
     assertThat(response.jsonPath().getString("data")).isEqualTo("refreshed content");
-
   }
 
   @Test

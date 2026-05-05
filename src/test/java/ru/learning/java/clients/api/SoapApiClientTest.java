@@ -9,6 +9,8 @@ import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import ru.learning.java.clients.api.base.BaseApiTest;
 
 import java.util.HashMap;
@@ -76,5 +78,109 @@ public class SoapApiClientTest extends BaseApiTest {
                  .assertThat()
                  .statusCode(200)
                  .body(hasXPath("//*[local-name()='NumberToDollarsResult']"));
+  }
+
+  @Test
+  @Order(3)
+  @Story("SOAP")
+  @DisplayName("3. SOAP — конвертация нуля")
+  void testSoapZeroToWords() {
+    String envelope = """
+    <?xml version="1.0" encoding="utf-8"?>
+    <soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+      <soap:Body>
+        <NumberToWords xmlns="http://www.dataaccess.com/webservicesserver/">
+          <ubiNum>0</ubiNum>
+        </NumberToWords>
+      </soap:Body>
+    </soap:Envelope>
+    """;
+
+    Response response = soapApiClient
+      .sendSoapRequest(
+        SOAP_URL, envelope,
+        "http://www.dataaccess.com/webservicesserver/NumberToWords",
+        new HashMap<>()
+      )
+      .extract().response();
+
+    String result = response.xmlPath()
+                            .getString("Envelope.Body.NumberToWordsResponse.NumberToWordsResult");
+
+    assertThat(response.statusCode()).isEqualTo(200);
+    assertThat(result).containsIgnoringCase("zero");
+  }
+
+  @Test
+  @Order(4)
+  @Story("SOAP")
+  @DisplayName("4. SOAP — конвертация 1000")
+  void testSoapThousandToWords() {
+    String envelope = """
+    <?xml version="1.0" encoding="utf-8"?>
+    <soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+      <soap:Body>
+        <NumberToWords xmlns="http://www.dataaccess.com/webservicesserver/">
+          <ubiNum>1000</ubiNum>
+        </NumberToWords>
+      </soap:Body>
+    </soap:Envelope>
+    """;
+
+    soapApiClient
+      .sendSoapRequest(
+        SOAP_URL, envelope,
+        "http://www.dataaccess.com/webservicesserver/NumberToWords",
+        new HashMap<>()
+      )
+      .assertThat()
+      .statusCode(200)
+      .body(hasXPath("//*[local-name()='NumberToWordsResult']")); // XPath — второй способ валидации
+  }
+
+  // ── Утилита ───────────────────────────────────────────────────────────────
+
+  private String buildNumberToWordsEnvelope(int number) {
+    return """
+    <?xml version="1.0" encoding="utf-8"?>
+    <soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+      <soap:Body>
+        <NumberToWords xmlns="http://www.dataaccess.com/webservicesserver/">
+          <ubiNum>%d</ubiNum>
+        </NumberToWords>
+      </soap:Body>
+    </soap:Envelope>
+    """.formatted(number);
+  }
+
+  // ── Параметризованный тест ────────────────────────────────────────────────
+
+  @ParameterizedTest(name = "{0} → должно содержать ''{1}''")
+  @CsvSource({
+    "1,    one",
+    "42,   forty",
+    "100,  one hundred",
+    "999,  nine hundred"
+  })
+  @Order(5)
+  @Story("SOAP")
+  @DisplayName("5. SOAP — параметризованная конвертация чисел в слова")
+  void testNumberToWordsParameterized(int number, String expectedWord) {
+    String envelope = buildNumberToWordsEnvelope(number);
+
+    Response response = soapApiClient
+      .sendSoapRequest(
+        SOAP_URL, envelope,
+        "http://www.dataaccess.com/webservicesserver/NumberToWords",
+        new HashMap<>()
+      )
+      .extract().response();
+
+    String result = response.xmlPath()
+                            .getString("Envelope.Body.NumberToWordsResponse.NumberToWordsResult");
+
+    assertThat(result)
+      .as("Число %d должно содержать слово '%s'", number, expectedWord)
+      .containsIgnoringCase(expectedWord);
   }
 }
