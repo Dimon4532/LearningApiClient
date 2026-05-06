@@ -1,5 +1,6 @@
 package ru.learning.java.clients.api;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.github.tomakehurst.wiremock.WireMockServer;
 import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
@@ -19,11 +20,7 @@ import ru.learning.java.clients.api.base.BaseApiTest;
 
 import java.util.HashMap;
 
-import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
-import static com.github.tomakehurst.wiremock.client.WireMock.containing;
-import static com.github.tomakehurst.wiremock.client.WireMock.get;
-import static com.github.tomakehurst.wiremock.client.WireMock.notMatching;
-import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
+import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -70,6 +67,27 @@ public class DigestApiClientTest extends BaseApiTest {
         .withStatus(200)
         .withHeader("Content-Type", "application/json")
         .withBody("{\"authenticated\": true, \"user\": \"" + DIGEST_USER + "\"}")));
+
+    // Стаб: POST без Digest → 401 + challenge
+    wireMock.stubFor(post(urlEqualTo("/digest-protected/data"))
+      .atPriority(2)
+      .withHeader("Authorization", notMatching("Digest.*"))
+      .willReturn(aResponse()
+        .withStatus(401)
+        .withHeader("WWW-Authenticate",
+          "Digest realm=\"test@wiremock\", " +
+            "qop=\"auth\", " +
+            "nonce=\"dcd98b7102dd2f0e8b11d0f600bfb0c094\", " +
+            "opaque=\"5ccc069c403ebaf9f0171e9517f40e42\"")));
+
+    // Стаб: POST с Digest → 201 + JSON
+    wireMock.stubFor(post(urlEqualTo("/digest-protected/data"))
+      .atPriority(1)
+      .withHeader("Authorization", containing("Digest"))
+      .willReturn(aResponse()
+        .withStatus(201)
+        .withHeader("Content-Type", "application/json")
+        .withBody("{\"id\": 42, \"status\": \"created\"}")));
   }
 
   @AfterAll
@@ -153,5 +171,55 @@ public class DigestApiClientTest extends BaseApiTest {
     assertThat(wwwAuth).contains("realm=");
     assertThat(wwwAuth).contains("nonce=");
     assertThat(wwwAuth).contains("qop=");
+  }
+
+
+// ── POST с Digest ─────────────────────────────────────────────────────────
+
+  @Test
+  @Order(5)
+  @Story("Digest Auth")
+  @DisplayName("5. WireMock: POST с Digest-заголовком возвращает 201")
+  @Severity(SeverityLevel.BLOCKER)
+  void testPostWithDigestOnWireMock() {
+    String body = "{\"name\": \"test\", \"value\": 100}";
+
+    Response response = digestApiClient
+      .sendPostWithDigest(
+        MOCK_URL + "/digest-protected/data",
+        201, DIGEST_USER, DIGEST_PASS,body,
+        new HashMap<>(), new HashMap<>(), new HashMap<>()
+      )
+      .extract().response();
+
+    assertThat(response.jsonPath().getInt("id")).isEqualTo(42);
+    assertThat(response.jsonPath().getString("status")).isEqualTo("created");
+  }
+
+  @Test
+  @Order(6)
+  @Story("Digest Auth")
+  @DisplayName("6. WireMock: POST с пустым телом проходит аутентификацию")
+  @Severity(SeverityLevel.NORMAL)
+  void testPostWithDigestEmptyBody() {
+// ...
+  }
+
+  @Test
+  @Order(7)
+  @Story("Digest Auth")
+  @DisplayName("7. httpbin.org: POST с Digest и JSON-телом")
+  @Severity(SeverityLevel.CRITICAL)
+  void testHttpBinPostWithDigest() {
+// ...
+  }
+
+  @Test
+  @Order(8)
+  @Story("Digest Auth")
+  @DisplayName("8. POST с сериализацией Java-объекта через Jackson")
+  @Severity(SeverityLevel.NORMAL)
+  void testPostDigestWithJacksonObject() throws JsonProcessingException {
+// ...
   }
 }
