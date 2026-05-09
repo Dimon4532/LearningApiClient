@@ -43,9 +43,11 @@ public class DigestApiClientTest extends BaseApiTest {
   static void setUp() {
     digestApiClient = new DigestApiClient();
 
-    wireMock = new WireMockServer(wireMockConfig().dynamicPort());
+    wireMock = new WireMockServer(wireMockConfig()
+      .dynamicPort()
+      .bindAddress("127.0.0.1"));
     wireMock.start();
-    MOCK_URL = "http://localhost:" + wireMock.port();
+    MOCK_URL = "http://127.0.0.1:" + wireMock.port();
 
     // Стаб: первый запрос без Authorization → 401 + challenge
     wireMock.stubFor(get(urlEqualTo("/digest-protected"))
@@ -92,7 +94,9 @@ public class DigestApiClientTest extends BaseApiTest {
 
   @AfterAll
   static void tearDown() {
-    wireMock.stop();
+    if (wireMock != null && wireMock.isRunning()) {
+      wireMock.stop();
+    }
   }
 
   // ── Реальный сервис httpbin.org ───────────────────────────────────────────
@@ -202,7 +206,32 @@ public class DigestApiClientTest extends BaseApiTest {
   @DisplayName("6. WireMock: POST с пустым телом проходит аутентификацию")
   @Severity(SeverityLevel.NORMAL)
   void testPostWithDigestEmptyBody() {
-// ...
+    String body = null;
+
+    Response response = digestApiClient
+      .sendPostWithDigest(
+        MOCK_URL + "/digest-protected/data",
+        201, DIGEST_USER, DIGEST_PASS, body,
+        new HashMap<>(), new HashMap<>(), new HashMap<>()
+      )
+      .extract().response();
+
+    assertThat(response.jsonPath().getInt("id")).isEqualTo(42);
+    assertThat(response.jsonPath().getString("status")).isEqualTo("created");
+
+    boolean digestPostWithoutBody = wireMock.getAllServeEvents().stream()
+      .anyMatch(event -> {
+        String authorization = event.getRequest().getHeader("Authorization");
+        String requestBody = event.getRequest().getBodyAsString();
+
+        return "POST".equals(event.getRequest().getMethod().getName())
+          && "/digest-protected/data".equals(event.getRequest().getUrl())
+          && authorization != null
+          && authorization.contains("Digest")
+          && (requestBody == null || requestBody.isEmpty());
+      });
+
+    assertThat(digestPostWithoutBody).isTrue();
   }
 
   @Test
