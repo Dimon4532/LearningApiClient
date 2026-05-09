@@ -44,8 +44,6 @@ public class DigestApiClientTest extends BaseApiTest {
 
   @BeforeAll
   static void setUp() {
-    digestApiClient = new DigestApiClient();
-
     wireMock = new WireMockServer(wireMockConfig().dynamicPort());
     wireMock.start();
     MOCK_URL = "http://localhost:" + wireMock.port();
