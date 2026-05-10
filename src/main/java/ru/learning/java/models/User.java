@@ -11,6 +11,7 @@ import lombok.Builder;
 /**
  * Модель пользователя (Java Record) с поддержкой Bean Validation.
  */
+@Builder
 public record User(
   @NotNull @Positive Long id,
   @NotBlank String name,
@@ -22,10 +23,8 @@ public record User(
   String website,
   @Valid Company company
 ) {
+  
   @Builder
-  public User {
-  }
-
   public record Address(
     @NotBlank String street,
     String suite,
@@ -34,24 +33,18 @@ public record User(
     String zipcode,
     @Valid Geo geo
   ) {
+    
     @Builder
-    public Address {
-    }
-
     public record Geo(String lat, String lng) {
-      @Builder
-      public Geo {
-      }
     }
   }
 
+  
+  @Builder
   public record Company(
     @NotBlank String name,
     String catchPhrase,
     String bs
   ) {
-    @Builder
-    public Company {
-    }
   }
 }
