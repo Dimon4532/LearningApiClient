@@ -259,7 +259,7 @@ public class DigestApiClientTest extends BaseApiTest {
   @Story("Digest Auth")
   @DisplayName("7. httpbingo.org: POST с Digest и JSON-телом")
   @Severity(SeverityLevel.CRITICAL)
-  void testHttpBinPostWithDigest() {
+  void testHttpBingoPostWithDigestJsonBody() {
     String body = "{\"message\": \"hello digest\"}";
 
     Response response = digestApiClient
