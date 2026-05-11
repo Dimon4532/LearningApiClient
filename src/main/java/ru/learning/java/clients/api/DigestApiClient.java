@@ -57,6 +57,15 @@ public class DigestApiClient extends ApiClient {
 
   /**
    * POST с Digest Authentication
+   *
+   * @param url            адрес сервиса
+   * @param expectedStatus ожидаемый статус
+   * @param username       имя пользователя
+   * @param password       пароль
+   * @param body           тело запроса
+   * @param headers        дополнительные заголовки
+   * @param pathParams     параметры пути
+   * @param queryParams    параметры запроса
    */
   public ValidatableResponse sendPostWithDigest(
     String url, int expectedStatus,
@@ -78,6 +87,44 @@ public class DigestApiClient extends ApiClient {
       .body(body == null ? "" : body)
       .when()
       .post(url)
+      .then()
+      .assertThat()
+      .statusCode(expectedStatus)
+      .log().ifValidationFails();
+  }
+
+  /**
+   * PUT с Digest Authentication
+   *
+   * @param url            адрес сервиса
+   * @param expectedStatus ожидаемый статус
+   * @param username       имя пользователя
+   * @param password       пароль
+   * @param body           тело запроса
+   * @param headers        дополнительные заголовки
+   * @param pathParams     параметры пути
+   * @param queryParams    параметры запроса
+   */
+  public ValidatableResponse sendPutWithDigest(
+    String url, int expectedStatus,
+    String username, String password, String body,
+    Map<String, String> headers,
+    Map<String, String> pathParams,
+    Map<String, String> queryParams
+  ) {
+    Objects.requireNonNull(url, "url must not be null");
+    Objects.requireNonNull(username, "username must not be null");
+    Objects.requireNonNull(password, "password must not be null");
+
+    return given()
+      .auth().digest(username, password)
+      .contentType("application/json")
+      .headers(defaultIfNull(headers))
+      .pathParams(defaultIfNull(pathParams))
+      .queryParams(defaultIfNull(queryParams))
+      .body(body == null ? "" : body)
+      .when()
+      .put(url)
       .then()
       .assertThat()
       .statusCode(expectedStatus)

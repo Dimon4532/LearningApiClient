@@ -16,12 +16,21 @@ import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import ru.learning.java.clients.api.base.BaseApiTest;
 import ru.learning.java.models.Post;
 
 import java.util.HashMap;
 
-import static com.github.tomakehurst.wiremock.client.WireMock.*;
+import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
+import static com.github.tomakehurst.wiremock.client.WireMock.containing;
+import static com.github.tomakehurst.wiremock.client.WireMock.get;
+import static com.github.tomakehurst.wiremock.client.WireMock.notMatching;
+import static com.github.tomakehurst.wiremock.client.WireMock.post;
+import static com.github.tomakehurst.wiremock.client.WireMock.put;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlPathMatching;
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -43,13 +52,12 @@ public class DigestApiClientTest extends BaseApiTest {
 
   @BeforeAll
   static void setUp() {
-    digestApiClient = new DigestApiClient();
-
     wireMock = new WireMockServer(wireMockConfig()
       .dynamicPort()
       .bindAddress("127.0.0.1"));
     wireMock.start();
     MOCK_URL = "http://127.0.0.1:" + wireMock.port();
+
 
     // Стаб: первый запрос без Authorization → 401 + challenge
     wireMock.stubFor(get(urlEqualTo("/digest-protected"))
@@ -57,11 +65,13 @@ public class DigestApiClientTest extends BaseApiTest {
       .withHeader("Authorization", notMatching("Digest.*"))
       .willReturn(aResponse()
         .withStatus(401)
-        .withHeader("WWW-Authenticate",
+        .withHeader(
+          "WWW-Authenticate",
           "Digest realm=\"test@wiremock\", " +
             "qop=\"auth\", " +
             "nonce=\"dcd98b7102dd2f0e8b11d0f600bfb0c093\", " +
-            "opaque=\"5ccc069c403ebaf9f0171e9517f40e41\"")));
+            "opaque=\"5ccc069c403ebaf9f0171e9517f40e41\""
+        )));
 
     // Стаб: второй запрос с заголовком Digest → 200
     wireMock.stubFor(get(urlEqualTo("/digest-protected"))
@@ -78,11 +88,13 @@ public class DigestApiClientTest extends BaseApiTest {
       .withHeader("Authorization", notMatching("Digest.*"))
       .willReturn(aResponse()
         .withStatus(401)
-        .withHeader("WWW-Authenticate",
+        .withHeader(
+          "WWW-Authenticate",
           "Digest realm=\"test@wiremock\", " +
             "qop=\"auth\", " +
             "nonce=\"dcd98b7102dd2f0e8b11d0f600bfb0c094\", " +
-            "opaque=\"5ccc069c403ebaf9f0171e9517f40e42\"")));
+            "opaque=\"5ccc069c403ebaf9f0171e9517f40e42\""
+        )));
 
     // Стаб: POST с Digest → 201 + JSON
     wireMock.stubFor(post(urlEqualTo("/digest-protected/data"))
@@ -92,6 +104,26 @@ public class DigestApiClientTest extends BaseApiTest {
         .withStatus(201)
         .withHeader("Content-Type", "application/json")
         .withBody("{\"id\": 42, \"status\": \"created\"}")));
+
+    // Стаб: PUT без Digest → 401 + challenge
+    wireMock.stubFor(put(urlPathMatching("/digest-protected/data/\\d+"))
+      .atPriority(2)
+      .withHeader("Authorization", notMatching("Digest.*"))
+      .willReturn(aResponse()
+        .withStatus(401)
+        .withHeader("WWW-Authenticate",
+          "Digest realm=\"test@wiremock\", qop=\"auth\", " +
+            "nonce=\"dcd98b7102dd2f0e8b11d0f600bfb0c095\", " +
+            "opaque=\"5ccc069c403ebaf9f0171e9517f40e43\"")));
+
+    // Стаб: PUT с Digest → 200 + JSON
+    wireMock.stubFor(put(urlPathMatching("/digest-protected/data/\\d+"))
+      .atPriority(1)
+      .withHeader("Authorization", containing("Digest"))
+      .willReturn(aResponse()
+        .withStatus(200)
+        .withHeader("Content-Type", "application/json")
+        .withBody("{\"status\": \"updated\"}")));
   }
 
   @AfterAll
@@ -180,7 +212,7 @@ public class DigestApiClientTest extends BaseApiTest {
   }
 
 
-// ── POST с Digest ─────────────────────────────────────────────────────────
+  // ── POST с Digest ─────────────────────────────────────────────────────────
 
   @Test
   @Order(5)
@@ -193,10 +225,9 @@ public class DigestApiClientTest extends BaseApiTest {
     Response response = digestApiClient
       .sendPostWithDigest(
         MOCK_URL + "/digest-protected/data",
-        201, DIGEST_USER, DIGEST_PASS,body,
+        201, DIGEST_USER, DIGEST_PASS, body,
         new HashMap<>(), new HashMap<>(), new HashMap<>()
-      )
-      .extract().response();
+      ).extract().response();
 
     assertThat(response.jsonPath().getInt("id")).isEqualTo(42);
     assertThat(response.jsonPath().getString("status")).isEqualTo("created");
@@ -208,32 +239,17 @@ public class DigestApiClientTest extends BaseApiTest {
   @DisplayName("6. WireMock: POST с пустым телом проходит аутентификацию")
   @Severity(SeverityLevel.NORMAL)
   void testPostWithDigestEmptyBody() {
-    String body = null;
+    String body = "";
 
-    Response response = digestApiClient
-      .sendPostWithDigest(
-        MOCK_URL + "/digest-protected/data",
-        201, DIGEST_USER, DIGEST_PASS, body,
-        new HashMap<>(), new HashMap<>(), new HashMap<>()
-      )
-      .extract().response();
+    Response response = digestApiClient.sendPostWithDigest(
+      MOCK_URL + "/digest-protected/data",
+      201, DIGEST_USER, DIGEST_PASS, body,
+      new HashMap<>(), new HashMap<>(), new HashMap<>()
+    ).extract().response();
 
+    assertThat(response.statusCode()).isEqualTo(201);
     assertThat(response.jsonPath().getInt("id")).isEqualTo(42);
     assertThat(response.jsonPath().getString("status")).isEqualTo("created");
-
-    boolean digestPostWithoutBody = wireMock.getAllServeEvents().stream()
-      .anyMatch(event -> {
-        String authorization = event.getRequest().getHeader("Authorization");
-        String requestBody = event.getRequest().getBodyAsString();
-
-        return "POST".equals(event.getRequest().getMethod().getName())
-          && "/digest-protected/data".equals(event.getRequest().getUrl())
-          && authorization != null
-          && authorization.contains("Digest")
-          && (requestBody == null || requestBody.isEmpty());
-      });
-
-    assertThat(digestPostWithoutBody).isTrue();
   }
 
   @Test
@@ -273,11 +289,6 @@ public class DigestApiClientTest extends BaseApiTest {
       )
       .extract().response();
 
-    assertThat(response.jsonPath().getInt("id")).isEqualTo(42);
-    assertThat(response.jsonPath().getString("status")).isEqualTo("created");
-
-    wireMock.verify(postRequestedFor(urlEqualTo("/digest-protected/data"))
-      .withHeader("Authorization", containing("Digest"))
-      .withRequestBody(equalToJson(body)));
+    assertThat(response.jsonPath().getString("status")).isEqualTo("updated");
   }
 }

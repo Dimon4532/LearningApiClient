@@ -37,6 +37,7 @@ public abstract class BaseApiTest {
     apiClient = new ApiClient();
     apiKeyClient = new ApiKeyClient();
     authApiClient = new AuthApiClient();
+    digestApiClient = new DigestApiClient();
     formApiClient = new FormApiClient();
     jwtClient = new JwtApiClient();
     multipartApiClient = new MultipartApiClient();

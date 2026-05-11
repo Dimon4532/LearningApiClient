@@ -28,7 +28,6 @@ class ModelValidatorTest {
                                                  .email("john@example.com")
                                                  .username("john_doe")
                                                  .build();
-
     Set<ConstraintViolation<CreateUserRequest>> violations = ModelValidator.validate(request);
     assertThat(violations).isEmpty();
   }
@@ -44,7 +43,6 @@ class ModelValidatorTest {
                                                  .build();
 
     Set<String> messages = ModelValidator.validateAndDescribe(request);
-
     assertThat(messages).anyMatch(m -> m.startsWith("email:"));
   }
 

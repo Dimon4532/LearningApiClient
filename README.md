@@ -26,7 +26,7 @@
 
 Этот проект создан для обучения и демонстрации лучших практик тестирования REST API в Java. Он включает:
 
-- ✅ **74 готовых тестовых сценариев** для различных HTTP методов и типов аутентификации
+- ✅ **Более 100 готовых тестовых сценариев** для различных HTTP методов и типов аутентификации
 - ✅ **Гибкую архитектуру** с паттерном API Client и единым базовым классом `BaseApiTest`
 - ✅ **Интеграцию с Allure** для красивых отчетов
 - ✅ **Акторную модель** с Apache Pekko для асинхронных запросов
@@ -485,11 +485,13 @@ ApiClient  (базовые HTTP операции: GET, POST, PUT, PATCH, DELETE)
 - `ApiClientTest`
 - `ApiKeyClientTest`
 - `AuthApiClientTest`
+- `DigestApiClientTest`
 - `FormApiClientTest`
 - `JwtApiClientTest`
 - `MultipartApiClientTest`
 - `OAuthApiClientTest`
 - `SoapApiClientTest`
+- `UserApiContractTest`
 - `XmlApiTest`
 
 ## 📊 Allure отчеты
