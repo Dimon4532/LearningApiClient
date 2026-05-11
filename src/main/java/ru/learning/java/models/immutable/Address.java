@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.immutables.value.Value;
 
 /**
- * Демонстрация Immutables: иммутабельный value-объект.
+ * Immutables: иммутабельный value-объект.
  * Кодогенерация создаст класс ImmutableAddress с builder, equals, hashCode, toString.
  */
 @Value.Immutable
