@@ -41,7 +41,7 @@
         <assertj.version>3.27.7</assertj.version>
         <!--  JWT parsing (для валидации JWT токенов)  -->
         <java-jwt.version>4.4.0</java-jwt.version>
-        <!--  WireMock для мокирования OAuth сервера  -->
+        <!--  WireMock для мокирования сервера  -->
         <wiremock-standalone.version>3.10.0</wiremock-standalone.version>
         <!--  Jakarta Bean Validation (JSR-380)  -->
         <jakarta-validation-api.version>3.1.1</jakarta-validation-api.version>
@@ -49,6 +49,10 @@
         <hibernate-validator.version>8.0.2.Final</hibernate-validator.version>
         <!--  Expression Language — нужен Hibernate Validator для сообщений  -->
         <expressly.version>5.0.0</expressly.version>
+        <!-- Аннотации Immutables  -->
+        <immutables.version>2.10.1</immutables.version>
+        <!-- TestNG  -->
+        <testng.version>7.10.2</testng.version>
 
         <!--  Plugin  -->
         <!--  Maven Surefire  -->
@@ -164,7 +168,7 @@
             <version>${java-jwt.version}</version>
             <scope>test</scope>
         </dependency>
-        <!--  WireMock для мокирования OAuth сервера  -->
+        <!--  WireMock для мокирования сервера  -->
         <dependency>
             <groupId>org.wiremock</groupId>
             <artifactId>wiremock-standalone</artifactId>
@@ -188,6 +192,26 @@
             <groupId>org.glassfish.expressly</groupId>
             <artifactId>expressly</artifactId>
             <version>${expressly.version}</version>
+        </dependency>
+        <!-- Аннотации Immutables (только compile-time) -->
+        <dependency>
+            <groupId>org.immutables</groupId>
+            <artifactId>value</artifactId>
+            <version>${immutables.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <!-- Интеграция с Jackson -->
+        <dependency>
+            <groupId>org.immutables</groupId>
+            <artifactId>value-annotations</artifactId>
+            <version>${immutables.version}</version>
+        </dependency>
+        <!-- TestNG для демонстрации @DataProvider -->
+        <dependency>
+            <groupId>org.testng</groupId>
+            <artifactId>testng</artifactId>
+            <version>${testng.version}</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
     <build>

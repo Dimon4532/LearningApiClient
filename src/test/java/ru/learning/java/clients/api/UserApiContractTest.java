@@ -19,7 +19,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Контрактные тесты: проверяем, что внешний API возвращает данные,
- * соответствующие нашим Bean Validation правилам.
+ * соответствующие Bean Validation правилам.
  */
 @Feature("Bean Validation (JSR-380)")
 @DisplayName("Контрактные тесты — валидация ответа API через JSR-380")

@@ -145,7 +145,12 @@ public class ApiClientTest extends BaseApiTest {
   @DisplayName("7. POST запрос с объектом")
   @Description("Создание поста из Java объекта")
   void testPostRequestWithObject() throws JsonProcessingException {
-    Post newPost = new Post(1L, null, "My Test Post", "Content of my test post");
+    Post newPost = Post.builder()
+                       .userId(1L)
+                       .id(null)
+                       .title("My Test Post")
+                       .body("Content of my test post")
+                       .build();
 
     Response response = apiClient
       .sendPost(

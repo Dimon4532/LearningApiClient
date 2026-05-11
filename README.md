@@ -99,6 +99,7 @@ src/
 │   │   │   ├── ApiClient.java           ← базовые HTTP операции
 │   │   │   ├── ApiKeyClient.java        ← API Keys (header / query / Basic Auth)
 │   │   │   ├── AuthApiClient.java       ← Basic Auth + Bearer Token
+│   │   │   ├── DigestApiClient.java     ← Digest Authentication 
 │   │   │   ├── FormApiClient.java       ← application/x-www-form-urlencoded
 │   │   │   ├── MultipartApiClient.java  ← multipart/form-data
 │   │   │   ├── OAuthApiClient.java      ← OAuth 2.0 full flow
@@ -128,10 +129,12 @@ src/
     │   │   ├── ApiClientTest.java          ← 22 теста, базовые HTTP операции
     │   │   ├── ApiKeyClientTest.java       ← 10 тестов, API Keys
     │   │   ├── AuthApiClientTest.java      ← 14 тестов, Basic Auth + Bearer Token
+    │   │   ├── DigestApiClientTest.java    ← 9 тестов, аутентификация через HTTP Digest (WireMock)
     │   │   ├── FormApiClientTest.java      ← 7 тестов, form-data
     │   │   ├── MultipartApiClientTest.java ← 4 теста, загрузка файлов
     │   │   ├── OAuthApiClientTest.java     ← 11 тестов, OAuth 2.0 (WireMock)
     │   │   ├── SoapApiClientTest.java      ← 2 теста, SOAP
+    │   │   ├── UserApiContractTest.java    ← 3 теста, контрактные тесты
     │   │   └── XmlApiTest.java             ← 4 теста, XML
     │   └── suites/
     │       └── ApiTestSuite.java         ← запуск всех тестов одной командой
@@ -304,6 +307,7 @@ ApiClient  (базовые HTTP операции: GET, POST, PUT, PATCH, DELETE)
 │   ├── OAuthApiClient  (OAuth 2.0: Client Credentials, Password, Refresh Token)
 │   └── JwtApiClient  (JWT: получение JWT и запрос с использованием полученного JWT)
 ├── ApiKeyClient  (API Keys: header / query-param / Stripe-style Basic Auth)
+├── DigestApiClient (API для Digest Authentication (RFC 7616))
 ├── FormApiClient  (application/x-www-form-urlencoded + cookies)
 ├── MultipartApiClient  (multipart/form-data, загрузка файлов)
 └── SoapApiClient  (SOAP / text/xml)
@@ -347,6 +351,18 @@ ApiClient  (базовые HTTP операции: GET, POST, PUT, PATCH, DELETE)
 - **Через query-параметр**: `sendGetWithApiKeyQuery()` — для `api_key`, `key`, `token` и т.д.
 - **Stripe-style Basic Auth**: `sendGetWithApiKeyAsBasicAuth()` — ключ как username, пустой password (
   `.auth().preemptive().basic()`)
+
+### DigestApiClient (Digest Authentication, RFC 7616)
+
+Расширяет `ApiClient` и реализует HTTP Digest Authentication:
+
+- `sendGetWithDigest()` — GET с Digest Auth
+- `sendPostWithDigest()` — POST с Digest Auth + JSON-телом
+- `sendPutWithDigest()` — PUT с Digest Auth + JSON-телом
+
+В отличие от Basic Auth, Digest не передаёт пароль открытым текстом — вместо этого клиент и сервер обмениваются
+MD5-хэшами с использованием случайного `nonce` от сервера. REST Assured автоматически выполняет двухшаговый flow:
+первый запрос → `401 + WWW-Authenticate`, второй → расчёт `response` и повтор с заголовком `Authorization: Digest ...`.
 
 ### FormApiClient (для form-data)
 
@@ -428,6 +444,21 @@ ApiClient  (базовые HTTP операции: GET, POST, PUT, PATCH, DELETE)
 - ✅ Декодирование Base64 и проверка формата `apiKey:` (без пароля)
 - ✅ Сравнение header vs query: оба способа доставляют ключ на сервер
 
+### DigestApiClientTest (9 тестов) — аутентификация через HTTP Digest
+
+Тесты используют комбинацию реальных публичных сервисов (`httpbin.org`, `httpbingo.org`) и встроенного **WireMock** для
+изолированных и негативных сценариев:
+
+- ✅ Успешный Digest flow на `httpbin.org` (401 challenge → response с MD5-хэшем)
+- ✅ Негативный тест: неверный пароль → 401 от `httpbin.org`
+- ✅ WireMock: двухшаговый flow — первый запрос 401, второй с Digest-заголовком 200
+- ✅ WireMock: первый «голый» запрос содержит challenge (`WWW-Authenticate: Digest ...` с `realm`, `nonce`, `qop`)
+- ✅ WireMock: POST с Digest-заголовком возвращает 201
+- ✅ WireMock: POST с пустым телом успешно проходит аутентификацию
+- ✅ `httpbingo.org`: POST с Digest и JSON-телом
+- ✅ POST с сериализацией Java-объекта (`Post`) через Jackson + verify тела запроса в WireMock
+- ✅ Параметризованный PUT (`@ValueSource`) с Digest для разных `id`
+
 ### FormApiClientTest (7 тестов) — form-data
 
 - ✅ POST с form parameters (с cookies и без)
@@ -467,6 +498,16 @@ ApiClient  (базовые HTTP операции: GET, POST, PUT, PATCH, DELETE)
 - ✅ GET защищённого ресурса с валидным JWT → 200
 - ✅ Сервер отклоняет истёкший JWT → 401
 - ✅ Неверные credentials → 401 при получении токена
+
+### UserApiContractTest (3 теста) — контрактные тесты (Bean Validation, JSR-380)
+
+Проверяют, что внешний API возвращает данные, соответствующие правилам Bean Validation в моделях `User`
+и `CreateUserRequest` (`@NotNull`, `@NotBlank`, `@Email`, `@Positive` и т.д.):
+
+- ✅ `GET /users/1` — одиночный пользователь соответствует контракту модели `User`
+- ✅ `GET /users` — каждый элемент списка валиден по правилам `User`
+- ✅ `POST /users` — модель `CreateUserRequest` проверяется через `ModelValidator.requireValid()` до отправки HTTP-запроса
+
 
 ### AllureIntegrationTest — демонстрация Allure
 
@@ -545,20 +586,20 @@ void testGetRequestWithActor() throws ExecutionException, InterruptedException {
 
 3. **Улучшение моделей данных**
     - ~~Добавить валидацию через Bean Validation (JSR-303)~~ `ModelValidator` + аннотации в `User`/`CreateUserRequest`
-    - Создать builders для всех моделей
-    - Добавить примеры использования Immutables
+    - ~~Создать builders для всех моделей~~
+    - ~~Добавить примеры использования Immutables~~ `ImmutablesDemoTest`
 
 4. **Data-Driven тестирование**
     - ~~Параметризованные тесты с `@ParameterizedTest`~~ `SoapApiClientTest`
-    - Чтение тестовых данных из CSV/JSON файлов
-    - Использование TestNG DataProvider
+    - ~~Чтение тестовых данных из CSV/JSON файлов~~ `UserCsvDataDrivenTest` + `UserJsonDataDrivenTest`
+    - ~~Использование TestNG DataProvider~~ `UserDataProviderTest`
 
 ### 🚀 Уровень 2: Продвинутые техники
 
 5. **CI/CD Integration**
-    - GitHub Actions / GitLab CI конфигурация
+    - ~~GitHub Actions / GitLab CI конфигурация~~ [workflows](.github/workflows)
     - Docker контейнеры для тестов
-    - Автоматическая публикация Allure отчетов
+    - ~~Автоматическая публикация Allure отчетов~~ [allure-report.yml](.github/workflows/allure-report.yml)
 
 6. **Performance Testing**
     - Интеграция с Gatling

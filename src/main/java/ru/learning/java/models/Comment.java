@@ -1,8 +1,11 @@
 package ru.learning.java.models;
 
+import lombok.Builder;
+
 /**
  * Модель комментария
  */
+@Builder
 public record Comment(
   Long postId,
   Long id,
