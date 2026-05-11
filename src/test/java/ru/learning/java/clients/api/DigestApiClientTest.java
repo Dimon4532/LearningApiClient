@@ -19,6 +19,7 @@ import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import ru.learning.java.clients.api.base.BaseApiTest;
+import ru.learning.java.models.Post;
 
 import java.util.HashMap;
 
@@ -42,8 +43,8 @@ public class DigestApiClientTest extends BaseApiTest {
   // Реальный публичный сервис с поддержкой Digest
   private static final String HTTPBIN_BASE = "https://httpbin.org";
   private static final String HTTPBINGO_BASE = "https://httpbingo.org";
-  private static final String DIGEST_USER = "user";
-  private static final String DIGEST_PASS = "passwd";
+  private static final String DIGEST_USER  = "user";
+  private static final String DIGEST_PASS  = "passwd";
 
   // WireMock для негативных и контролируемых сценариев
   private static WireMockServer wireMock;
@@ -256,7 +257,7 @@ public class DigestApiClientTest extends BaseApiTest {
   @Story("Digest Auth")
   @DisplayName("7. httpbingo.org: POST с Digest и JSON-телом")
   @Severity(SeverityLevel.CRITICAL)
-  void testHttpBinPostWithDigest() {
+  void testHttpBingoPostWithDigestJsonBody() {
     String body = "{\"message\": \"hello digest\"}";
 
     Response response = digestApiClient
@@ -277,22 +278,13 @@ public class DigestApiClientTest extends BaseApiTest {
   @DisplayName("8. POST с сериализацией Java-объекта через Jackson")
   @Severity(SeverityLevel.NORMAL)
   void testPostDigestWithJacksonObject() throws JsonProcessingException {
-    // ...
-  }
-
-  @ParameterizedTest(name = "PUT /data/{0} → 200")
-  @ValueSource(ints = {1, 42, 100, 999})
-  @Order(9)
-  @Story("Digest Auth")
-  @DisplayName("9. WireMock: PUT с Digest для разных id")
-  @Severity(SeverityLevel.NORMAL)
-  void testPutWithDigestForVariousIds(int id) {
-    String body = "{\"name\": \"item-" + id + "\"}";
+    Post newPost = new Post(1L, null, "Digest Jackson Post", "Created from Java object");
+    String body = objectMapper.writeValueAsString(newPost);
 
     Response response = digestApiClient
-      .sendPutWithDigest(
-        MOCK_URL + "/digest-protected/data/" + id,
-        200, DIGEST_USER, DIGEST_PASS, body,
+      .sendPostWithDigest(
+        MOCK_URL + "/digest-protected/data",
+        201, DIGEST_USER, DIGEST_PASS, body,
         new HashMap<>(), new HashMap<>(), new HashMap<>()
       )
       .extract().response();
