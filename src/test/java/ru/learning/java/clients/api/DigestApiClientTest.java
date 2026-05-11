@@ -32,6 +32,7 @@ public class DigestApiClientTest extends BaseApiTest {
 
   // Реальный публичный сервис с поддержкой Digest
   private static final String HTTPBIN_BASE = "https://httpbin.org";
+  private static final String HTTPBINGO_BASE = "https://httpbingo.org";
   private static final String DIGEST_USER  = "user";
   private static final String DIGEST_PASS  = "passwd";
 
@@ -237,10 +238,21 @@ public class DigestApiClientTest extends BaseApiTest {
   @Test
   @Order(7)
   @Story("Digest Auth")
-  @DisplayName("7. httpbin.org: POST с Digest и JSON-телом")
+  @DisplayName("7. httpbingo.org: POST с Digest и JSON-телом")
   @Severity(SeverityLevel.CRITICAL)
-  void testHttpBinPostWithDigest() {
-// ...
+  void testHttpBingoPostWithDigestJsonBody() {
+    String body = "{\"message\": \"hello digest\"}";
+
+    Response response = digestApiClient
+      .sendPostWithDigest(
+        HTTPBINGO_BASE + "/digest-auth/auth/" + DIGEST_USER + "/" + DIGEST_PASS,
+        200, DIGEST_USER, DIGEST_PASS, body,
+        new HashMap<>(), new HashMap<>(), new HashMap<>()
+      )
+      .extract().response();
+
+    assertThat(response.jsonPath().getBoolean("authenticated")).isTrue();
+    assertThat(response.jsonPath().getString("user")).isEqualTo(DIGEST_USER);
   }
 
   @Test
