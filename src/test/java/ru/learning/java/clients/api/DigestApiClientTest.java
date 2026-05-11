@@ -17,6 +17,7 @@ import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 import ru.learning.java.clients.api.base.BaseApiTest;
+import ru.learning.java.models.Post;
 
 import java.util.HashMap;
 
@@ -261,6 +262,22 @@ public class DigestApiClientTest extends BaseApiTest {
   @DisplayName("8. POST с сериализацией Java-объекта через Jackson")
   @Severity(SeverityLevel.NORMAL)
   void testPostDigestWithJacksonObject() throws JsonProcessingException {
-// ...
+    Post newPost = new Post(1L, null, "Digest Jackson Post", "Created from Java object");
+    String body = objectMapper.writeValueAsString(newPost);
+
+    Response response = digestApiClient
+      .sendPostWithDigest(
+        MOCK_URL + "/digest-protected/data",
+        201, DIGEST_USER, DIGEST_PASS, body,
+        new HashMap<>(), new HashMap<>(), new HashMap<>()
+      )
+      .extract().response();
+
+    assertThat(response.jsonPath().getInt("id")).isEqualTo(42);
+    assertThat(response.jsonPath().getString("status")).isEqualTo("created");
+
+    wireMock.verify(postRequestedFor(urlEqualTo("/digest-protected/data"))
+      .withHeader("Authorization", containing("Digest"))
+      .withRequestBody(equalToJson(body)));
   }
 }
