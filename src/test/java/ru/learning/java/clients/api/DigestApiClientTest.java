@@ -19,14 +19,17 @@ import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import ru.learning.java.clients.api.base.BaseApiTest;
+import ru.learning.java.models.Post;
 
 import java.util.HashMap;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.containing;
+import static com.github.tomakehurst.wiremock.client.WireMock.equalToJson;
 import static com.github.tomakehurst.wiremock.client.WireMock.get;
 import static com.github.tomakehurst.wiremock.client.WireMock.notMatching;
 import static com.github.tomakehurst.wiremock.client.WireMock.post;
+import static com.github.tomakehurst.wiremock.client.WireMock.postRequestedFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.put;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlPathMatching;
@@ -277,7 +280,23 @@ public class DigestApiClientTest extends BaseApiTest {
   @DisplayName("8. POST с сериализацией Java-объекта через Jackson")
   @Severity(SeverityLevel.NORMAL)
   void testPostDigestWithJacksonObject() throws JsonProcessingException {
-    // ...
+    Post newPost = new Post(1L, null, "Digest Jackson Post", "Created from Java object");
+    String body = objectMapper.writeValueAsString(newPost);
+
+    Response response = digestApiClient
+      .sendPostWithDigest(
+        MOCK_URL + "/digest-protected/data",
+        201, DIGEST_USER, DIGEST_PASS, body,
+        new HashMap<>(), new HashMap<>(), new HashMap<>()
+      )
+      .extract().response();
+
+    assertThat(response.jsonPath().getInt("id")).isEqualTo(42);
+    assertThat(response.jsonPath().getString("status")).isEqualTo("created");
+
+    wireMock.verify(postRequestedFor(urlEqualTo("/digest-protected/data"))
+      .withHeader("Authorization", containing("Digest"))
+      .withRequestBody(equalToJson(body)));
   }
 
   @ParameterizedTest(name = "PUT /data/{0} → 200")

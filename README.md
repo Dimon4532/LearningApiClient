@@ -482,6 +482,7 @@ ApiClient  (базовые HTTP операции: GET, POST, PUT, PATCH, DELETE)
 указывать каждый класс вручную.
 
 Включает:
+
 - `ApiClientTest`
 - `ApiKeyClientTest`
 - `AuthApiClientTest`
@@ -505,8 +506,7 @@ bash mvn allure:serve
 
 Демонстрация асинхронных запросов с Apache Pekko:
 
-```java 
-
+```java
 @Test
 @Order(1)
 @Story("Акторы")
@@ -585,77 +585,77 @@ void testGetRequestWithActor() throws ExecutionException, InterruptedException {
 
 10. **Database Testing**
 
-- Интеграция с TestContainers
-- Проверка данных в БД после API вызовов
-- Flyway/Liquibase для миграций
+    - Интеграция с TestContainers
+    - Проверка данных в БД после API вызовов
+    - Flyway/Liquibase для миграций
 
 11. **Security Testing**
 
-- OWASP ZAP интеграция
-- Security headers валидация
-- SQL injection тесты
-- XSS проверки
+    - OWASP ZAP интеграция
+    - Security headers валидация
+    - SQL injection тесты
+    - XSS проверки
 
 12. **Monitoring & Observability**
 
-- Prometheus metrics
-- ELK Stack для логов
-- Distributed tracing (Jaeger/Zipkin)
+    - Prometheus metrics
+    - ELK Stack для логов
+    - Distributed tracing (Jaeger/Zipkin)
 
 13. **Advanced Reporting**
 
-- Кастомные Allure plugins
-- Интеграция с Jira/TestRail
-- Slack/Email уведомления
-- Тренды качества (historical reports)
+    - Кастомные Allure plugins
+    - Интеграция с Jira/TestRail
+    - Slack/Email уведомления
+    - Тренды качества (historical reports)
 
 14. **GraphQL Testing**
 
-- GraphQL запросы и мутации
-- Schema validation
-- Subscription тесты
+    - GraphQL запросы и мутации
+    - Schema validation
+    - Subscription тесты
 
 15. **WebSocket Testing**
 
-- Real-time communication тесты
-- Socket.IO интеграция
+    - Real-time communication тесты
+    - Socket.IO интеграция
 
 ### 💼 Практические задания
 
 16. **Создать тесты для реального API**
 
-- GitHub API
-- Swagger Petstore
-- Rick and Morty API
-- Pokemon API
+    - GitHub API
+    - Swagger Petstore
+    - Rick and Morty API
+    - Pokemon API
 
 17. **Реализовать паттерны**
 
-- Builder для сложных запросов
-- Chain of Responsibility для middleware
-- Strategy для различных auth механизмов
-- Factory для создания клиентов
+    - Builder для сложных запросов
+    - Chain of Responsibility для middleware
+    - Strategy для различных auth механизмов
+    - Factory для создания клиентов
 
 18. **Документация**
 
-- API документация с Swagger
-- Javadoc для всех публичных методов
-- Confluence/Wiki страницы
-- Video tutorials
+    - API документация с Swagger
+    - Javadoc для всех публичных методов
+    - Confluence/Wiki страницы
+    - Video tutorials
 
 ### 🎨 Дополнительные идеи
 
 19. **Кросс-платформенное тестирование**
 
-- Сравнение REST vs GraphQL vs gRPC
-- Миграция с RestAssured на другие библиотеки
-- Polyglot тесты (Java + Python + JavaScript)
+    - Сравнение REST vs GraphQL vs gRPC
+    - Миграция с RestAssured на другие библиотеки
+    - Polyglot тесты (Java + Python + JavaScript)
 
 20. **AI/ML интеграция**
 
-- Автоматическая генерация тестов из Swagger
-- Анализ логов с помощью ML
-- Предсказание потенциальных багов
+    - Автоматическая генерация тестов из Swagger
+    - Анализ логов с помощью ML
+    - Предсказание потенциальных багов
 
 ## 📚 Полезные ресурсы
 
