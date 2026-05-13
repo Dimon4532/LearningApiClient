@@ -1,0 +1,22 @@
+[
+  {
+    "userId": 1,
+    "title": "Первый пост",
+    "body": "Контент первого поста"
+  },
+  {
+    "userId": 2,
+    "title": "Hello World",
+    "body": "Lorem ipsum dolor sit amet"
+  },
+  {
+    "userId": 3,
+    "title": "Юникод заголовок ",
+    "body": "Тело с unicode-символами ✓"
+  },
+  {
+    "userId": 1,
+    "title": "Long body",
+    "body": "Очень длинное тело поста для проверки edge case ............................................"
+  }
+]
