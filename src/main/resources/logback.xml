@@ -1,0 +1,9 @@
+<configuration>
+    <!-- Уровень для пакета текущего проекта -->
+    <logger name="ru.learning.java" level="ERROR" />
+
+    <!-- Корневой уровень -->
+    <root level="INFO">
+        <appender-ref ref="CONSOLE" />
+    </root>
+</configuration>

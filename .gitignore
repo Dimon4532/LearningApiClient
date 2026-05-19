@@ -35,6 +35,7 @@ build/
 !**/src/test/**/build/
 
 ### Allure-result ###
+.allure
 allure-results
 
 ### VS Code ###
