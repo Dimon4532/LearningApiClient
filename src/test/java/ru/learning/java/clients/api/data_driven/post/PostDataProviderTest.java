@@ -1,4 +1,4 @@
-package ru.learning.java.clients.api.data_driven;
+package ru.learning.java.clients.api.data_driven.post;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.restassured.response.Response;
