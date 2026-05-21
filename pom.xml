@@ -53,6 +53,10 @@
         <immutables.version>2.10.1</immutables.version>
         <!-- TestNG  -->
         <testng.version>7.10.2</testng.version>
+        <!-- Pact JVM  -->
+        <pact.version>4.6.14</pact.version>
+        <!-- Atlassian Swagger Request Validator (OpenAPI 3.x) -->
+        <swagger-validator.version>2.44.1</swagger-validator.version>
 
         <!--  Plugin  -->
         <!--  Maven Surefire  -->
@@ -79,6 +83,13 @@
             <groupId>io.rest-assured</groupId>
             <artifactId>rest-assured</artifactId>
             <version>${rest-assured.version}</version>
+        </dependency>
+        <!-- JSON Schema валидация ответов-->
+        <dependency>
+            <groupId>io.rest-assured</groupId>
+            <artifactId>json-schema-validator</artifactId>
+            <version>${rest-assured.version}</version>
+            <scope>test</scope>
         </dependency>
         <!--  Jackson  -->
         <dependency>
@@ -211,6 +222,34 @@
             <groupId>org.testng</groupId>
             <artifactId>testng</artifactId>
             <version>${testng.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <!-- Pact JVM: consumer-side с JUnit 5 -->
+        <dependency>
+            <groupId>au.com.dius.pact.consumer</groupId>
+            <artifactId>junit5</artifactId>
+            <version>${pact.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <!-- Provider-side для демонстрации -->
+        <dependency>
+            <groupId>au.com.dius.pact.provider</groupId>
+            <artifactId>junit5</artifactId>
+            <version>${pact.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <!-- Schema-валидация запросов и ответов OpenAPI 3.x -->
+        <dependency>
+            <groupId>com.atlassian.oai</groupId>
+            <artifactId>swagger-request-validator-core</artifactId>
+            <version>${swagger-validator.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <!-- Интеграция с REST Assured: фильтр для автоматической проверки -->
+        <dependency>
+            <groupId>com.atlassian.oai</groupId>
+            <artifactId>swagger-request-validator-restassured</artifactId>
+            <version>${swagger-validator.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>

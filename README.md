@@ -506,8 +506,24 @@ MD5-хэшами с использованием случайного `nonce` о
 
 - ✅ `GET /users/1` — одиночный пользователь соответствует контракту модели `User`
 - ✅ `GET /users` — каждый элемент списка валиден по правилам `User`
-- ✅ `POST /users` — модель `CreateUserRequest` проверяется через `ModelValidator.requireValid()` до отправки HTTP-запроса
+- ✅ `POST /users` — модель `CreateUserRequest` проверяется через `ModelValidator.requireValid()` до отправки
+  HTTP-запроса
 
+### Contract Testing — OpenAPI / JSON Schema
+
+Параллель с Pact, но **provider-driven**: спецификация лежит в
+`src/test/resources/contracts/openapi/jsonplaceholder.yaml`, а тесты проверяют, что
+реальные запросы и ответы соответствуют схемам.
+
+- ✅ `UserOpenApiSchemaTest` — GET /users/1, GET /users через `SwaggerValidationFilter`
+- ✅ `PostOpenApiSchemaTest` — GET /posts/1, POST /posts (валидация и запроса, и ответа)
+- ✅ `UserJsonSchemaTest` — лёгкая альтернатива на JSON Schema (rest-assured `json-schema-validator`)
+
+| Подход      | Кто пишет контракт | Где живёт                          | Тулинг                              |
+|-------------|--------------------|------------------------------------|-------------------------------------|
+| Pact        | Consumer           | DSL → JSON в `target/pacts`        | pact-jvm                            |
+| OpenAPI     | Provider           | YAML в `contracts/openapi`         | atlassian/swagger-request-validator |
+| JSON Schema | Кто угодно         | `*.json` в `contracts/json-schema` | rest-assured json-schema-validator  |
 
 ### AllureIntegrationTest — демонстрация Allure
 
@@ -548,6 +564,7 @@ bash mvn allure:serve
 Демонстрация асинхронных запросов с Apache Pekko:
 
 ```java
+
 @Test
 @Order(1)
 @Story("Акторы")
@@ -608,8 +625,8 @@ void testGetRequestWithActor() throws ExecutionException, InterruptedException {
 
 7. **Contract Testing**
     - Spring Cloud Contract
-    - Pact для consumer-driven contracts
-    - OpenAPI/Swagger спецификации
+    - ~~Pact для consumer-driven contracts~~ `PostConsumerPactTest`, `UserConsumerPactTest`, `UserProviderPactVerificationTest`
+    - ~~OpenAPI/Swagger спецификации~~ `PostOpenApiSchemaTest`, `UserOpenApiSchemaTest`, `UserJsonSchemaTest`
 
 8. **Mock серверы**
     - ~~WireMock для мокирования API~~ → используется в `OAuthApiClientTest`

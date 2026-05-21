@@ -1,0 +1,96 @@
+openapi: 3.0.3
+info:
+  title: JsonPlaceholder API
+  description: |
+    Контракт для учебной интеграции OpenAPI в проект.
+    Используется параллельно с Pact-контрактами в `src/test/resources/pacts`.
+  version: 1.0.0
+servers:
+  - url: https://jsonplaceholder.typicode.com
+paths:
+  /users/{id}:
+    get:
+      operationId: getUserById
+      summary: Получить пользователя по id
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer, minimum: 1 }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/User' }
+        '404':
+          description: Not Found
+  /users:
+    get:
+      operationId: listUsers
+      summary: Список пользователей
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/User' }
+  /posts/{id}:
+    get:
+      operationId: getPostById
+      summary: Получить пост по id
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer, minimum: 1 }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Post' }
+  /posts:
+    post:
+      operationId: createPost
+      summary: Создать пост
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/PostInput' }
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Post' }
+components:
+  schemas:
+    User:
+      type: object
+      required: [id, name, username, email]
+      properties:
+        id:       { type: integer, minimum: 1 }
+        name:     { type: string, minLength: 1 }
+        username: { type: string, minLength: 1 }
+        email:    { type: string, format: email }
+        phone:    { type: string }
+        website:  { type: string }
+    PostInput:
+      type: object
+      required: [userId, title, body]
+      properties:
+        userId: { type: integer, minimum: 1 }
+        title:  { type: string, minLength: 1 }
+        body:   { type: string }
+    Post:
+      type: object
+      required: [id, userId, title, body]
+      properties:
+        id:     { type: integer, minimum: 1 }
+        userId: { type: integer, minimum: 1 }
+        title:  { type: string, minLength: 1 }
+        body:   { type: string }
