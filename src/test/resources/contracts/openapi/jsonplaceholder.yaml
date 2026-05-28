@@ -67,6 +67,60 @@ paths:
           content:
             application/json:
               schema: { $ref: '#/components/schemas/Post' }
+  /comments/{id}:
+    get:
+      operationId: getCommentById
+      summary: Получить комментарий по id
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer, minimum: 1 }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Comment' }
+        '404':
+          description: Not Found
+  /comments:
+    get:
+      operationId: listCommentsByPostId
+      summary: Получить комментарии к посту
+      parameters:
+        - name: postId
+          in: query
+          required: true
+          schema: { type: integer, minimum: 1 }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/Comment' }
+  /posts/{postId}/comments:
+    post:
+      operationId: createCommentForPost
+      summary: Создать комментарий к посту
+      parameters:
+        - name: postId
+          in: path
+          required: true
+          schema: { type: integer, minimum: 1 }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/CommentInput' }
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/CreatedComment' }
 components:
   schemas:
     User:
@@ -94,3 +148,28 @@ components:
         userId: { type: integer, minimum: 1 }
         title:  { type: string, minLength: 1 }
         body:   { type: string }
+    CommentInput:
+      type: object
+      required: [name, email, body]
+      properties:
+        name:  { type: string, minLength: 1 }
+        email: { type: string, format: email }
+        body:  { type: string, minLength: 1 }
+    Comment:
+      type: object
+      required: [postId, id, name, email, body]
+      properties:
+        postId: { type: integer, minimum: 1 }
+        id:     { type: integer, minimum: 1 }
+        name:   { type: string, minLength: 1 }
+        email:  { type: string, format: email }
+        body:   { type: string, minLength: 1 }
+    CreatedComment:
+      type: object
+      required: [postId, id, name, email, body]
+      properties:
+        postId: { type: string, pattern: '^[0-9]+$' }
+        id:     { type: integer, minimum: 1 }
+        name:   { type: string, minLength: 1 }
+        email:  { type: string, format: email }
+        body:   { type: string, minLength: 1 }
